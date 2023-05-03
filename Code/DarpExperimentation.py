@@ -4,7 +4,7 @@ from tqdm import tqdm
 import csv
 import math
 from Graph import Graph
-from GraphGenerator import createRandomGraph
+import GraphGenerator
 
 def findRidesServed(graph, requestOrder, timeLimit):
     """
@@ -107,3 +107,10 @@ if __name__ == '__main__':
 
     print("opt",opt(h,5))
     f=copy.deepcopy(h)
+
+    test = "test1.txt"
+    g = GraphGenerator.generateGraphFromFile(test)
+    print(g.edges)
+
+    print("opt",opt(g,5))
+    f=copy.deepcopy(g)
