@@ -94,7 +94,7 @@ def generateRequestGraphsWithDeadlines(numberOfNodes, p, min, max, num):
             if(random.random() >= 0.5 and currentGraphsWithDeadlines <= num):
                 currentGraphsWithDeadlines +=1 # increase the number of graphs we have generated so far with deadlines
                 for k in range(i + 1): # create the graph with random deadlines
-                    graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], generateRandomDeadline(numberOfNodes, p, min, max))
+                    graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], generateRandomDeadline(p, min, max))
 
             # either we created all of the number of graphs we want with deadlines or this is not a graph meant to have deadlines        
             else: 
