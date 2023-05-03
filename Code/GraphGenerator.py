@@ -32,7 +32,7 @@ def createRandomGraphWithDeadlines(numberOfVertices, numberOfEdges, ID, p, min, 
         while u == v:
             v = random.randint(1, numberOfVertices)
 
-        g.addEdgeWithDeadline(u, v, math.inf) # all edges will have infinite deadlines
+        g.addEdgeWithDeadline(u, v, generateRandomDeadline(p, min, max)) # all edges will have infinite deadlines
         i += 1
 
     return g
