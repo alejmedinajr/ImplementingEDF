@@ -107,21 +107,23 @@ def generateRequestGraphsWithDeadlines(numberOfNodes, p, min, max, num):
     return possibleRequestGraphs
 
 def generateGraphFromFile(graphInstanceFile):
-    f = open(graphInstanceFile, 'r')
-    #Lines = f.readlines()
+    try:
+        f = open(graphInstanceFile, 'r')
+        # the first line of input will be our vertices parameter for the graph 
+        g = Graph(int(f.readline().strip())) 
+        finished = False
+        while (not finished):
+            line = f.readline()
 
-    # the first two lines of input will be our parameters for the graph 
-    g = Graph(int(f.readline().strip()), int(f.readline().strip())) 
-    finished = False
-    while (not finished):
-        line = f.readline()
-
-        if not line:
-            return g # we are done with the graph (no more input lines)
-        
-        else: 
-            edgeInfo = line.split(' ')
-            # 0 = starting vertex, 1 = ending vertex, 2 = deadline
-            g.addEdgeWithDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2]))
-    f.close()
-    return g
+            if not line:
+                return g # we are done with the graph (no more input lines)
+            
+            else: 
+                edgeInfo = line.split(' ')
+                # 0 = starting vertex, 1 = ending vertex, 2 = deadline
+                g.addEdgeWithDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2]))
+        f.close() # done reading file, good practice to close it
+        return g # return the newly generated graph
+    
+    except: # if there was a problem with the file, raise an exception
+        raise Exception("Double check the file name you typed: " + graphInstanceFile)
