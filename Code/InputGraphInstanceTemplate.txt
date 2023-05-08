@@ -1,0 +1,8 @@
+NumberOfVertices
+StartVertex EndVertex Deadline
+StartVertex EndVertex Deadline
+StartVertex EndVertex Deadline
+...
+StartVertex EndVertex Deadline
+StartVertex EndVertex Deadline
+StartVertex EndVertex Deadline
