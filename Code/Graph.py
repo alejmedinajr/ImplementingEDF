@@ -2,14 +2,16 @@
 import math
 
 class Graph:
-    def __init__(self, numVertices, j):
+    def __init__(self, *args):
         # self.graph = defaultdict(list) #dictionary containing adjacency List
         self.graph = {}
-        for i in range(numVertices):
+        for i in range(args[0]):
             self.graph[i] = []
-        self.V = numVertices  # No. of vertices
+        self.V = args[0]  # No. of vertices
         self.edges = {} # for the edges (added 04/21)
-        self.id = j
+
+        if len(args) > 1:
+            self.id = args[1] # we were given an ID parameter
 
     def __str__(self):
         """
