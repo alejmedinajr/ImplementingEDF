@@ -72,7 +72,6 @@ def generateRequestGraphsWithDeadlines(numberOfNodes, p, min, max, num):
 
     locations = []
     lengths = []
-    currentGraphsWithDeadlines = 0
     # first just get a list of numbers for the locations
     for i in range(numberOfNodes):
         locations.append(i + 1)
@@ -86,23 +85,16 @@ def generateRequestGraphsWithDeadlines(numberOfNodes, p, min, max, num):
     
     possibleRequestGraphs = []
     
-    c = 0
+    id = 0
     for i in range(numberOfNodes * 2):  # total number of edges
         for j in range(lengths[i]):
-            graph = Graph(numberOfNodes, c)
-            # we want the graph to have random deadlines
-            if(random.random() >= 0.5 and currentGraphsWithDeadlines <= num):
-                currentGraphsWithDeadlines +=1 # increase the number of graphs we have generated so far with deadlines
-                for k in range(i + 1): # create the graph with random deadlines
+            for n in range(num):
+                graph = Graph(numberOfNodes, id)
+                for k in range(i + 1):
                     graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], generateRandomDeadline(p, min, max))
-
-            # either we created all of the number of graphs we want with deadlines or this is not a graph meant to have deadlines        
-            else: 
-                for k in range(i + 1): # create the graph with infite deadliens
-                    graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], math.inf)
-                    
-            possibleRequestGraphs.append(graph) # add the newly created graph to our collection of graphs
-            c += 1 # increase the id
+                possibleRequestGraphs.append(graph)
+                id += 1
+            n += 1 # want to perform this operation num times
 
     return possibleRequestGraphs
 
