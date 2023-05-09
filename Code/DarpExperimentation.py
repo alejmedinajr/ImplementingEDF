@@ -1,5 +1,4 @@
 import copy
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 import csv
 import math
@@ -94,7 +93,7 @@ def opt(graph, timeLimit):
 
 if __name__ == '__main__':    
     
-    h=Graph(9,0)
+    h=Graph(9,5)
     h.addEdgeWithDeadline(1,2,5)
     h.addEdgeWithDeadline(2,3,5)
     h.addEdgeWithDeadline(3,4,4)
@@ -103,6 +102,7 @@ if __name__ == '__main__':
     h.addEdgeWithDeadline(6,7,4)
     h.addEdgeWithDeadline(7,8,0)
     h.addEdgeWithDeadline(8,9,4)
+    print(h.id)
     print(h.edges)
 
     print("opt",opt(h,5))
@@ -114,3 +114,23 @@ if __name__ == '__main__':
 
     print("opt",opt(g,5))
     f=copy.deepcopy(g)
+
+    #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
+    #print(*z,sep="\n")
+
+    #w = GraphGenerator.generateRequestGraphsWithoutDeadlines(3)
+    #print(*w,sep="\n")
+
+    #z = GraphGenerator.createRandomGraphWithDeadlines(7, 13, 3, 0.8, 4, 9)
+    #print(z)
+    #f=copy.deepcopy(z)
+    #print("opt",opt(z,11))
+
+
+    #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
+    #print(*z,sep="\n")
+
+    #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
+    #print(*z,sep="\n")
+    Graph.vizualizeGraph(g, "exampleFromExpectations.png") # testing the newly added vizualization function in Graph
+   
