@@ -1,5 +1,9 @@
 # Class to represent a graph
 import math
+import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+
 
 class Graph:
     def __init__(self, *args):
@@ -15,13 +19,32 @@ class Graph:
 
     def __str__(self):
         """
-        :return: the contents of the graph and id number
+        :prints a visualization of the graph
         """
         s = ""
-        for i in range(self.V):
-            s += str(i) + ":" + str(self.graph[i]) + "\n"
-        return "graph id: " + str(self.id) + "\n" + s
+        #for i in range(self.edges):
+        #    s += str(i) + ":" + str(self.graph[i]) + "\n"
+        #return "graph id: " + str(self.id) + "\n" + str(self.edges)
+    
+    def vizualizeGraph(self, saveTo):
+        """
+        :param saveTo: The file where the png graph will be saved to
+        :This function uses networkx and matplot to create an image vizualization of the graph
+        """
+        G = nx.Graph() # create a nx graph for vizualization
+        for i in self.edges: # add each edge of the graph to the nx graph 
+            G.add_edge(i[0],i[1], deadline=self.edges[i])
 
+        # computes the layout using the Fruchterman-Reingold algorithm
+        pos = nx.spring_layout(G)
+
+        # draw the graph
+        nx.draw(G, pos=pos, with_labels=True)
+        deadlines = nx.get_edge_attributes(G,'deadline') # save the deadlines in a collection
+        nx.draw_networkx_edge_labels(G,pos,edge_labels=deadlines) # include the deadlines on the graph
+        plt.savefig(saveTo) # save the vizualization to a png file
+        plt.show() # show the graph
+        
     def getNumberVerticies(self):
         return self.V
 
