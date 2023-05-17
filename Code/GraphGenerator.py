@@ -5,104 +5,143 @@ import math
 from Graph import Graph
 
 def generateRandomDeadline(p, min, max):
+    '''
+    This function generates a random deadline in the range [min, max] if a randomly generated value is less than or equal to the p parameter value
+    :param p: The threshold value used to have a p percent of requests in a graph
+    :param min: The minimum value of a possible deadline
+    :param max: The maximum value of a possible deadline
+    :return: A randomly generated deadline if the random value does not exceed p, otherwise returns 0
+    '''
     isRequest = random.random() <= p # for generating random deadlines, we only want p percent of deadlines (p is parameterized)
     if (isRequest): return random.randint(min, max) # want random deadline, random deadline value will be in range of (min, max)
     else: return 0 # no random deadline, return 0 to signify this is not a request
 
-def createRandomGraphWithoutDeadlines(numberOfVertices, numberOfEdges, ID):
-    i = 0
-    g = Graph(numberOfVertices, ID)
-    while i < (numberOfEdges):
-        u = random.randint(1, numberOfVertices)
-        v = random.randint(1, numberOfVertices)
-        while u == v:
-            v = random.randint(1, numberOfVertices)
+def createRandomGraphWithoutDeadlines(numberOfNodes, numberOfEdges, id):
+    '''
+    This function generates a single random graph with a given number of nodes and edges. Each edge is assigned an infinite deadline.
+    :param numberOfNodes: The number of nodes the randomly generated graph will have
+    :param numberOfEdges: The number of edges the randomly generated graph will have
+    :param id: The id that the newly generated graph will have
+    :return: A randomly generated graph with a specified number of nodes and edges
+    '''
+    e = 0 # counter for number of edges
+    graph = Graph(numberOfNodes, id) # new graph object that will be returned
+    while e < (numberOfEdges): # only want to add the specified edges
+        u = random.randint(1, numberOfNodes) # randomly select starting vertex
+        v = random.randint(1, numberOfNodes) # randomly select ending vertex
+        while u == v: # if u and v are the same vertex, we need to keep randomly selecting a random vertex until we get a unique ending vertex
+            v = random.randint(1, numberOfNodes)
 
-        g.addEdgeWithDeadline(u, v, math.inf) # all edges will have infinite deadlines
-        i += 1
+        graph.addEdgeWithDeadline(u, v, math.inf) # all edges will have infinite deadlines
+        e += 1 # increase the counter for number of edges since we added a new edge
 
-    return g
+    return graph # return the randomly generated graph
 
-def createRandomGraphWithDeadlines(numberOfVertices, numberOfEdges, ID, p, min, max):
-    i = 0
-    g = Graph(numberOfVertices, ID)
-    while i < (numberOfEdges):
-        u = random.randint(1, numberOfVertices)
-        v = random.randint(1, numberOfVertices)
-        while u == v:
-            v = random.randint(1, numberOfVertices)
+def createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, p, min, max):
+    '''
+    This function generates a single random graph with a given number of nodes and edges. Each edge is may be assigned a deadline with a value [min, max].
+    :param numberOfNodes: The number of nodes the randomly generated graph will have
+    :param numberOfEdges: The number of edges the randomly generated graph will have
+    :param id: The id that the newly generated graph will have
+    :param p: The percent of edges that will have deadlines (we only want a p percent of edges to be requests)
+    :param min: The minimum value that a deadline could be
+    :param max: The maximum value that a deadline could be
+    :return: A randomly generated graph with a specified number of nodes and edges
+    '''
+    e = 0 # counter for number of edges
+    graph = Graph(numberOfNodes, id) # new graph object that will be returned
+    while e < (numberOfEdges): # only want to add the specified edges
+        u = random.randint(1, numberOfNodes) # randomly select starting vertex
+        v = random.randint(1, numberOfNodes) # randomly select ending vertex
+        while u == v: # if u and v are the same vertex, we need to keep randomly selecting a random vertex until we get a unique ending vertex
+            v = random.randint(1, numberOfNodes)
 
-        g.addEdgeWithDeadline(u, v, generateRandomDeadline(p, min, max)) # all edges will have infinite deadlines
-        i += 1
+        graph.addEdgeWithDeadline(u, v, generateRandomDeadline(p, min, max)) # randomly generate a deadline between vertices u and v
+        e += 1 # increase the counter for number of edges since we added a new edge
 
-    return g
+    return graph # return the randomly generated graph
 
 def generateRequestGraphsWithoutDeadlines(numberOfNodes):
-    '''This method will create every possible directed graph with the given number of nodes'''
+    '''
+    This function generates all possible directed graphs with a given number of nodes. All possible permutations of edges are considered, and each edge is assigned an infinite deadline.
+    :param numberOfNodes: The number of nodes each graph will have
+    :return: A collection of all the possible graphs with n vertices where n is the numberOfNodes
+    '''
+    locations = [] # a collection of possible locations of nodes in a graph
+    lengths = [] # a collection of all of the lengths between any two vertices in a graph
 
-    locations = []
-    lengths = []
-    # first just get a list of numbers for the locations
-    for i in range(numberOfNodes):
+    for i in range(numberOfNodes): # find possible locations of nodes in the graph
         locations.append(i + 1)
-    # find all the permutations of 2 of these locations to get all the possible edges
-    possibleRequests = list(itertools.permutations(locations, 2))
-    possibleEdgePermutations = []
-    # find all the permutations/combinations of all of these edges to get the possible graphs.
-    for i in range(2 * numberOfNodes):
+    
+    possibleRequests = list(itertools.permutations(locations, 2)) # find all the permutations of 2 of these locations to get all the possible edges
+    possibleEdgePermutations = [] # collection to store every combination of edges in the graph
+    for i in range(2 * numberOfNodes): # find all the permutations/combinations of all of these edges to get the possible graphs.
         possibleEdgePermutations.append(list(itertools.combinations(possibleRequests, i + 1)))
         lengths.append(len(list(itertools.combinations(possibleRequests, i + 1))))
     
-    possibleRequestGraphs = []
-    
-    c = 0
-    for i in range(numberOfNodes * 2):  # total number of edges
-        for j in range(lengths[i]):
-            graph = Graph(numberOfNodes, c)
-            for k in range(i + 1):
-                graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], math.inf)
-            possibleRequestGraphs.append(graph)
-            c += 1
-
-    return possibleRequestGraphs
-
-
-def generateRequestGraphsWithDeadlines(numberOfNodes, p, min, max, num):
-    '''This method will create every possible directed graph with the given number of nodes'''
-
-    locations = []
-    lengths = []
-    # first just get a list of numbers for the locations
-    for i in range(numberOfNodes):
-        locations.append(i + 1)
-    # find all the permutations of 2 of these locations to get all the possible edges
-    possibleRequests = list(itertools.permutations(locations, 2))
-    possibleEdgePermutations = []
-    # find all the permutations/combinations of all of these edges to get the possible graphs.
-    for i in range(2 * numberOfNodes):
-        possibleEdgePermutations.append(list(itertools.combinations(possibleRequests, i + 1)))
-        lengths.append(len(list(itertools.combinations(possibleRequests, i + 1))))
-    
-    possibleRequestGraphs = []
+    possibleRequestGraphs = [] # collection of graphs that will be returned
     
     id = 0
     for i in range(numberOfNodes * 2):  # total number of edges
         for j in range(lengths[i]):
-            for n in range(num):
-                graph = Graph(numberOfNodes, id)
-                for k in range(i + 1):
-                    graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], generateRandomDeadline(p, min, max))
-                possibleRequestGraphs.append(graph)
-                id += 1
-            n += 1 # want to perform this operation num times
+            graph = Graph(numberOfNodes, id) # new graph
+            for k in range(i + 1):
+                graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], math.inf) # add an edge with an infinite deadline (representing no deadline)
+            possibleRequestGraphs.append(graph) # add the newly created graph to our collection of graphs
+            id += 1 # incrementing the graph ID for the next graph
 
-    return possibleRequestGraphs
+    return possibleRequestGraphs # return the list of generated graphs
+
+
+def generateRequestGraphsWithDeadlines(numberOfNodes, p, min, max, copies):
+    '''
+    This function generates all possible directed graphs with a given number of nodes. All possible permutations of edges are considered, and each edge is assigned a random deadline.
+    :param numberOfNodes: The number of nodes each graph will have
+    :param p: Percent of edges we want to have deadlines (not every edge should be a request)
+    :param min: The minimum value that will be used for randomly generating a request's deadline
+    :param max: The maximum value that will be used for randomly genrating a request's deadline
+    :param copies: The number of copies of each graph that is desired (this allows the same graph to have different random deadlines)
+    :return: A collection of all the possible graphs with n vertices where n is the numberOfNodes
+    '''
+    locations = [] # a collection of possible locations of nodes in a graph
+    lengths = [] # a collection of all of the lengths between any two vertices in a graph
+    
+    for i in range(numberOfNodes): # find possible locations of nodes in the graph
+        locations.append(i + 1)
+
+    possibleRequests = list(itertools.permutations(locations, 2)) # find all the permutations of 2 of these locations to get all the possible edges
+    possibleEdgePermutations = [] # collection to store every combination of edges in the graph
+    for i in range(2 * numberOfNodes): # find all the permutations/combinations of all of these edges to get the possible graphs.
+        possibleEdgePermutations.append(list(itertools.combinations(possibleRequests, i + 1)))
+        lengths.append(len(list(itertools.combinations(possibleRequests, i + 1))))
+    
+    possibleRequestGraphs = [] # collection of graphs that will be returned
+    
+    id = 0
+    for i in range(numberOfNodes * 2):  # total number of edges
+        for j in range(lengths[i]):
+            for n in range(copies): # we want to make a parameterized amount of copies for each graph created 
+                graph = Graph(numberOfNodes, id) # new graph
+                for k in range(i + 1):
+                    graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], generateRandomDeadline(p, min, max)) # add an edge with a possibly randomly generted deadline
+                possibleRequestGraphs.append(graph) # add the newly created graph to our collection of graphs
+                id += 1 # incrementing the graph ID for the next graph
+            n += 1 # increment the variable to reflect we created +1 copy of the current graph
+
+    return possibleRequestGraphs # return the list of generated graphs
 
 def generateGraphFromFile(graphInstanceFile):
+    '''
+    This function reads a file to generate a graph. The first line of the file specifies the number of vertices, and each subsequent line specifies an edge and its associated deadline.
+    :param graphInstanceFile: Specific file instance of graph to generate
+    :return: Graph representation based on the graph instance file
+    '''
+
     try:
-        f = open(graphInstanceFile, 'r')
-        # the first line of input will be our vertices parameter for the graph 
-        g = Graph(int(f.readline().strip())) 
+        print(graphInstanceFile)
+        f = open(graphInstanceFile.strip(), 'r')
+
+        g = Graph(int(f.readline().strip())) # the first line of input will be our vertices parameter for the graph 
         finished = False
         while (not finished):
             line = f.readline()
@@ -112,8 +151,8 @@ def generateGraphFromFile(graphInstanceFile):
             
             else: 
                 edgeInfo = line.split(' ')
-                # 0 = starting vertex, 1 = ending vertex, 2 = deadline
-                g.addEdgeWithDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2]))
+                g.addEdgeWithDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2])) # 0 = starting vertex, 1 = ending vertex, 2 = deadline
+
         f.close() # done reading file, good practice to close it
         return g # return the newly generated graph
     
