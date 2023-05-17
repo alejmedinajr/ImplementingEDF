@@ -26,14 +26,16 @@ class Graph:
         #    s += str(i) + ":" + str(self.graph[i]) + "\n"
         #return "graph id: " + str(self.id) + "\n" + str(self.edges)
     
-    def vizualizeGraph(self, saveTo):
+    def visualizeGraph(self, saveTo):
         """
+        This function uses networkx and matplot to create an image vizualization of the directed graph
         :param saveTo: The file where the png graph will be saved to
-        :This function uses networkx and matplot to create an image vizualization of the graph
         """
-        G = nx.Graph() # create a nx graph for vizualization
+        G = nx.DiGraph() # create a nx directed graph for vizualization
         for i in self.edges: # add each edge of the graph to the nx graph 
-            G.add_edge(i[0],i[1], deadline=self.edges[i])
+            # only add an edge if it has a deadline value that is not zero
+            if (self.edges[i] != 0):
+                G.add_edge(i[0],i[1], deadline=self.edges[i])
 
         # computes the layout using the Fruchterman-Reingold algorithm
         pos = nx.spring_layout(G)
