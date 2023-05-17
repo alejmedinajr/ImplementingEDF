@@ -16,7 +16,7 @@ def findRidesServed(graph, requestOrder, timeLimit):
     t = 1
     ridesServed = 1
     if (timeLimit == 0):
-        ridesServed = 0
+        return 0
     
     # WHILE (time hasn't expired, and there are still edges left)
     while (t < timeLimit and i < len(requestOrder) - 1):
@@ -108,23 +108,76 @@ if __name__ == '__main__':
     print("opt",opt(h,5))
     f=copy.deepcopy(h)
 
-    test = "test1.txt"
+    test = "TestCases\\test1.txt"
     g = GraphGenerator.generateGraphFromFile(test)
     print(g.edges)
 
     print("opt",opt(g,5))
     f=copy.deepcopy(g)
+    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
+    
+    test = "TestCases\\test2.txt"
+    g = GraphGenerator.generateGraphFromFile(test)
+    print(g.edges)
 
+    print("opt",opt(g,7))
+    f=copy.deepcopy(g)
+    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
+    
+    test = "TestCases\\test3.txt"
+    g = GraphGenerator.generateGraphFromFile(test)
+    print(g.edges)
+
+    print("opt",opt(g,7))
+    f=copy.deepcopy(g)
+    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
+    
+    test = "TestCases\\test4.txt"
+    g = GraphGenerator.generateGraphFromFile(test)
+    print(g.edges)
+    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
+    
+    #print("opt",opt(g,9))
+    f=copy.deepcopy(g)
+    
+    test = "TestCases\\test5.txt"
+    g = GraphGenerator.generateGraphFromFile(test)
+    print(g.edges)
+
+    #print("opt",opt(g,10))
+    f=copy.deepcopy(g)
+    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
+    
+    
+    test = "TestCases\\test6.txt"
+    g = GraphGenerator.generateGraphFromFile(test)
+    print(g.edges)
+
+    #print("opt",opt(g,10))
+    f=copy.deepcopy(g)
+    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
+    
+    
+    test = "TestCases\\test7.txt"
+    g = GraphGenerator.generateGraphFromFile(test)
+    print(g.edges)
+
+    #print("opt",opt(g,10))
+    f=copy.deepcopy(g)
+    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
+    
     #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
     #print(*z,sep="\n")
 
-    #w = GraphGenerator.generateRequestGraphsWithoutDeadlines(3)
+    #w = GraphGenerator.generateRequestGraphsWithoutDeadlines(4)
     #print(*w,sep="\n")
-
-    #z = GraphGenerator.createRandomGraphWithDeadlines(7, 13, 3, 0.8, 4, 9)
-    #print(z)
+    #Graph.visualizeGraph(w, "generateRequestGraphsWithoutDeadlinesID3.png")
+    z = GraphGenerator.createRandomGraphWithDeadlines(5, 4, 5, 0.8, 1, 4)
+    print(str(z.edges))
     #f=copy.deepcopy(z)
-    #print("opt",opt(z,11))
+    print("opt",opt(z,5))
+    Graph.visualizeGraph(z, "createRandomGraphWithDeadlineID5.png")
+    
 
 
     #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
@@ -132,5 +185,5 @@ if __name__ == '__main__':
 
     #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
     #print(*z,sep="\n")
-    Graph.vizualizeGraph(g, "exampleFromExpectations.png") # testing the newly added vizualization function in Graph
+    #Graph.visualizeGraph(g, "exampleFromExpectations.png") # testing the newly added vizualization function in Graph
    
