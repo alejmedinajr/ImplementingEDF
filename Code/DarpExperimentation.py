@@ -4,6 +4,7 @@ import csv
 import math
 from Graph import Graph
 import GraphGenerator
+import glob
 
 def findRidesServed(graph, requestOrder, timeLimit):
     """
@@ -90,100 +91,16 @@ def opt(graph, timeLimit):
     else:
         return max(ridesServed)
 
+def runTestCases(testFolder):
+    """
+    This function provides a way to run test cases from a specific directory. The visual of each graph is saved as a png file and shown to the user.
+    :param testFolder: Describes the root folder where the test cases are.
+    """
+    for file in glob.glob(testFolder + "\\test*.txt"): # find every file in the specified folder that is a test file (test#.txt)
+        graph = GraphGenerator.generateGraphFromFile(file) 
+        print(graph.edges) # print the edges
+        Graph.visualizeGraph(graph, file + "Visual.png") # showing visual to the user, also saves as a png image to the folder
 
 if __name__ == '__main__':    
-    
-    h=Graph(9,5)
-    h.addEdgeWithDeadline(1,2,5)
-    h.addEdgeWithDeadline(2,3,5)
-    h.addEdgeWithDeadline(3,4,4)
-    h.addEdgeWithDeadline(4,5,5)
-    h.addEdgeWithDeadline(1,6,0)
-    h.addEdgeWithDeadline(6,7,4)
-    h.addEdgeWithDeadline(7,8,0)
-    h.addEdgeWithDeadline(8,9,4)
-    print(h.id)
-    print(h.edges)
-
-    print("opt",opt(h,5))
-    f=copy.deepcopy(h)
-
-    test = "TestCases\\test1.txt"
-    g = GraphGenerator.generateGraphFromFile(test)
-    print(g.edges)
-
-    print("opt",opt(g,5))
-    f=copy.deepcopy(g)
-    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
-    
-    test = "TestCases\\test2.txt"
-    g = GraphGenerator.generateGraphFromFile(test)
-    print(g.edges)
-
-    print("opt",opt(g,7))
-    f=copy.deepcopy(g)
-    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
-    
-    test = "TestCases\\test3.txt"
-    g = GraphGenerator.generateGraphFromFile(test)
-    print(g.edges)
-
-    print("opt",opt(g,7))
-    f=copy.deepcopy(g)
-    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
-    
-    test = "TestCases\\test4.txt"
-    g = GraphGenerator.generateGraphFromFile(test)
-    print(g.edges)
-    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
-    
-    #print("opt",opt(g,9))
-    f=copy.deepcopy(g)
-    
-    test = "TestCases\\test5.txt"
-    g = GraphGenerator.generateGraphFromFile(test)
-    print(g.edges)
-
-    #print("opt",opt(g,10))
-    f=copy.deepcopy(g)
-    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
-    
-    
-    test = "TestCases\\test6.txt"
-    g = GraphGenerator.generateGraphFromFile(test)
-    print(g.edges)
-
-    #print("opt",opt(g,10))
-    f=copy.deepcopy(g)
-    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
-    
-    
-    test = "TestCases\\test7.txt"
-    g = GraphGenerator.generateGraphFromFile(test)
-    print(g.edges)
-
-    #print("opt",opt(g,10))
-    f=copy.deepcopy(g)
-    Graph.visualizeGraph(g, "createRandomGraphWithDeadlineID5.png")
-    
-    #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
-    #print(*z,sep="\n")
-
-    #w = GraphGenerator.generateRequestGraphsWithoutDeadlines(4)
-    #print(*w,sep="\n")
-    #Graph.visualizeGraph(w, "generateRequestGraphsWithoutDeadlinesID3.png")
-    z = GraphGenerator.createRandomGraphWithDeadlines(5, 4, 5, 0.8, 1, 4)
-    print(str(z.edges))
-    #f=copy.deepcopy(z)
-    print("opt",opt(z,5))
-    Graph.visualizeGraph(z, "createRandomGraphWithDeadlineID5.png")
-    
-
-
-    #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
-    #print(*z,sep="\n")
-
-    #z = GraphGenerator.generateRequestGraphsWithDeadlines(3, 0.7, 3, 7, 4)
-    #print(*z,sep="\n")
-    #Graph.visualizeGraph(g, "exampleFromExpectations.png") # testing the newly added vizualization function in Graph
-   
+    testFolder = "TestCases"
+    runTestCases(testFolder)
