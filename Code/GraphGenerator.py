@@ -37,12 +37,13 @@ def createRandomGraphWithoutDeadlines(numberOfNodes, numberOfEdges, id):
 
     return graph # return the randomly generated graph
 
-def createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, p, min, max):
+def createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, f, p, min, max):
     '''
     This function generates a single random graph with a given number of nodes and edges. Each edge is may be assigned a deadline with a value [min, max].
     :param numberOfNodes: The number of nodes the randomly generated graph will have
     :param numberOfEdges: The number of edges the randomly generated graph will have
     :param id: The id that the newly generated graph will have
+    :param f: The frequency of bidirectional edges. If f = 0, no bidirectional edges will be allowed, otherwise the value of f represents the frequency of bidirectional edges.
     :param p: The percent of edges that will have deadlines (we only want a p percent of edges to be requests)
     :param min: The minimum value that a deadline could be
     :param max: The maximum value that a deadline could be
@@ -56,8 +57,9 @@ def createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, p, min, max
         while u == v: # if u and v are the same vertex, we need to keep randomly selecting a random vertex until we get a unique ending vertex
             v = random.randint(1, numberOfNodes)
 
-        graph.addEdgeWithDeadline(u, v, generateRandomDeadline(p, min, max)) # randomly generate a deadline between vertices u and v
-        e += 1 # increase the counter for number of edges since we added a new edge
+        if ((f == 0) and (not graph.containsEdge(v, u))) or ((f > 0) and (f >= random.random())): # conditions to add an edge depending on value of f.
+            graph.addEdgeWithDeadline(u, v, generateRandomDeadline(p, min, max)) # randomly generate a deadline between vertices u and v
+            e += 1 # increase the counter for number of edges since we added a new edge
 
     return graph # return the randomly generated graph
 
@@ -140,21 +142,23 @@ def generateGraphFromFile(graphInstanceFile):
     try:
         print(graphInstanceFile)
         f = open(graphInstanceFile.strip(), 'r')
-
+        timeLimit = math.inf # by default, there will be an infinite value, unless specified differently in the input file
         g = Graph(int(f.readline().strip())) # the first line of input will be our vertices parameter for the graph 
         finished = False
         while (not finished):
             line = f.readline()
 
             if not line:
-                return g # we are done with the graph (no more input lines)
+                return g, timeLimit # we are done with the graph (no more input lines)
             
             else: 
-                edgeInfo = line.split(' ')
-                g.addEdgeWithDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2])) # 0 = starting vertex, 1 = ending vertex, 2 = deadline
-
+                try:
+                    edgeInfo = line.split(' ')
+                    g.addEdgeWithDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2])) # 0 = starting vertex, 1 = ending vertex, 2 = deadline
+                except:
+                    timeLimit = int(line) # we were given a timelimit input
         f.close() # done reading file, good practice to close it
-        return g # return the newly generated graph
+        return g, timeLimit # return the newly generated graph
     
     except: # if there was a problem with the file, raise an exception
         raise Exception("Double check the file name you typed: " + graphInstanceFile)
