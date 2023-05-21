@@ -97,8 +97,11 @@ def runTestCases(testFolder):
     :param testFolder: Describes the root folder where the test cases are.
     """
     for file in glob.glob(testFolder + "\\test*.txt"): # find every file in the specified folder that is a test file (test#.txt)
-        graph = GraphGenerator.generateGraphFromFile(file) 
+        graphInstance = GraphGenerator.generateGraphFromFile(file)
+        graph = graphInstance[0] # the graph is at index 0
+        timeLimit = graphInstance[1] # the timeLimit is at index 1
         print(graph.edges) # print the edges
+        print("timelimit: " + str(timeLimit))
         Graph.visualizeGraph(graph, file + "Visual.png") # showing visual to the user, also saves as a png image to the folder
 
 if __name__ == '__main__':    
