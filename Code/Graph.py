@@ -3,7 +3,6 @@ import math
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-from networkx.drawing.nx_pydot import graphviz_layout
 
 class Graph:
     def __init__(self, *args):
@@ -82,6 +81,12 @@ class Graph:
         self.graph[u - 1].append(v - 1)
         self.edges[u,v] = math.inf
         # print(self.graph)
+
+    def containsEdge(self, u, v):
+        if self.edges.has_key(u,v):
+            return True
+        else:
+            return False
 
     def getDeadline(self, u, v):     
         return self.edges[u,v] 
