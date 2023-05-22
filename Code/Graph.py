@@ -83,11 +83,6 @@ class Graph:
         # print(self.graph)
 
     def containsEdge(self, u, v):
-        if self.edges.has_key(u,v):
-            return True
-        else:
-            return False
-
     def getDeadline(self, u, v):     
         return self.edges[u,v] 
     
