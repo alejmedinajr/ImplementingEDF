@@ -83,16 +83,22 @@ class Graph:
         # print(self.graph)
 
     def containsEdge(self, u, v):
-    def getDeadline(self, u, v):     
+        return (u,v) in self.edges
+        
+    def getDeadline(self, u, v):
+        #print(self.edges)     
         return self.edges[u,v] 
     
     def deleteEdge(self, u, v):
         # function to delete an edge from graph
-        self.graph[u].remove(v)
+        self.graph[u-1].remove(v-1)
 
         # remove edge from edges as well
         del self.edges[u,v]
-        
+
+    def getNumberOfRequests(self):
+        return len(self.edges) # the length of the edges is the same as the number of requests. This means we can organize permuations based on this
+
     def copy(self):
         return self.graph.copy()
 
