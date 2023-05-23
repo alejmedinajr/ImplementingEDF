@@ -59,11 +59,10 @@ def createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, f, p, min, 
 
         if ((f == 0) and (not graph.containsEdge(v, u))) or ((f > 0) and (f >= random.random())): # conditions to add an edge depending on value of f.
             graph.addEdgeWithDeadline(u, v, generateRandomDeadline(p, min, max)) # randomly generate a deadline between vertices u and v
+            if (graph.getDeadline(u,v) == 0): # if the edge is not a request, then we want to remove it from the graph and list of edges, but we do not want to undo the increment to the edge counter
+                graph.deleteEdge(u,v) # delete the edge from the graph since it is not a request
             e += 1 # increase the counter for number of edges since we added a new edge
-
-        if (graph.getDeadline(u,v) == 0): # if the edge is not a request, then we want to remove it from the graph and list of edges, but we do not want to undo the increment to the edge counter
-            graph.deleteEdge(u,v) # delete the edge from the graph since it is not a request
-
+            
     return graph # return the randomly generated graph
 
 def generateRequestGraphsWithoutDeadlines(numberOfNodes):
