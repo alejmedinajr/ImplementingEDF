@@ -1,13 +1,15 @@
-test1: This test case represents the "bad instance of EDF". The time limit is 5, and the optimal solution should be 4. This is the solution obtained by serving the path 1-2-3-4-5. The EDF solution is 2, which would be obtained by via the paths 6-7, 8-9.
+test1: This test case represents the "bad instance of EDF". The time limit is 5, and the optimal solution should be 4. 1-2-3-4-5. The EDF solution is 2, which would be obtained by via the paths 6-7, 8-9.
 
-test2: This test case represents an instance with 7 vertices with a timelimit of 7. The optimal solution would be 3. Because we need to respect deadlines, and there are two deadlines with a deadline of 2, this means one of them will not be able to be respected taking into account we can service the edge with a deadline of 1 first. This means we can go from 6-7, jump to 4-5, then jump to 1-2. 
+test2: This test case has 7 vertices with a timelimit of 7. The optimal solution would be 2. 6-7, 1-6 
 
-test3: This is the reverse of test2. This also has an optimal solution of 3, which would be starting from vertex 7-6, jumping to vertex 3, and serving 3-2-1. 
+test3: This is the reverse of test2. This has an optimal solution of 3. 7-6-1, 2-1. 
 
-test4: This test case represents an instance where some edges have both deadlines going in both directions. There are 9 vertices and the timelimit is 9. The optimal solution is 4. Because of the deadlines, we are constrained to choose whether to start serving the lower valued deadlines first, but since most of the lower deadlines have deadlines such as 1 or 2, this means we cannot serve as much of them. I think we can get the same optimal solution by starting at vertex 7, and following the path 7-6-7-8, then jumping to vertex 2, and serving the deadline between 2-3. 
+test4: This test case represents an instance where some edges have both deadlines going in both directions. There are 9 vertices and the timelimit is 9. The optimal solution is 4. 7-6-7-8, 2-3. 
 
-test5: This test case represents an instance where all edges have deadlines going in both directions. There are 6 vertices and the timelimit is 10. The optimal solution is 4. Starting at vertex 3, we can serve 3-2-3-5-3.   
+test5: This test case represents an instance where all edges have deadlines going in both directions. There are 6 vertices and the timelimit is 10. The optimal solution is 3. 3-2-3-4.   
 
-test6: This test case is the same graph as test 4, but the deadlines are larger values to produce more interesting results. The timelimit is still 9. The optimal solution is 6. Starting at vertex 7, we can serve 7-6-7-8-9, then jump to vertex 2 and serve 2-7-2.  
+test6: This test case is the same graph as test 4, but the deadlines are larger values to produce more interesting results. The timelimit is still 9. The optimal solution is 5. 7-6-7-8-9, 2-3
 
-test7: This test case is the same graph as test 5, but the deadlines are larger values to produce more interesting reults. The timelimit is still 10. The optimal solution is 7. We can start at vertex 3 and serve 3-4-3-5-3-2-3 then jump to vertex 6 and serve 6-3. 
+test7: This test case is the same graph as test 5, but the deadlines are larger values to produce more interesting reults. The timelimit is still 10. The optimal solution is 6. 3-5-3-2-3-4, 6-3 
+
+test8: small instance for testing opt, 3 vertices, timelimit: 8. Optimal solution is 3. 1-2,2-3,1-3
