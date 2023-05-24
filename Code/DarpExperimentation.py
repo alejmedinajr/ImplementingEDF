@@ -75,7 +75,7 @@ def updateRequests(graph, requests, availableRequests, currentTime, windowSize, 
     while (i > 0):
         #print("Currenttime: " + str(currentTime))
         #print("iteration: " + str(i))
-        if currentTime > graph.getDeadline(availableRequests[i][0], availableRequests[i][1]):
+        if currentTime >= graph.getDeadline(availableRequests[i][0], availableRequests[i][1]):
             del availableRequests[i]
         i -= 1
     
@@ -119,14 +119,20 @@ def edf(graph, timeLimit):
     requestsServed = []
     while (currentTime <= timeLimit and (len(requests) > 0 or len(availableRequests) > 0)):
         # check if there are available requests
+        #updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit)
+
         if len(availableRequests) > 0:
             ridesServed += 1 # serve the request
+            #updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit)
+
             print("SERVED REQUEST: " + str(availableRequests[0]) + " AT TIME: " + str(currentTime))
             requestsServed.append(availableRequests[0])
             #currentTime += 1 # increment the time
             # a jump was made if the previous request's end coordinate is not the same as the start of the next request
             if previousRequest == (0,0) and (not previousRequest[1] == availableRequests[0][0]):
                 currentTime += 1
+                updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit)
+
                 print("JUMP AT TIME: " + str(currentTime))
 
             del availableRequests[0] # remove the request from availableRequests
@@ -151,8 +157,8 @@ def runTestCases(testFolder):
     This function provides a way to run test cases from a specific directory. The visual of each graph is saved as a png file and shown to the user.
     :param testFolder: Describes the root folder where the test cases are.
     """
-    #for file in glob.glob(testFolder + "\\test*.txt"): # find every file in the specified folder that is a test file (test#.txt)
-    for file in glob.glob(testFolder + "\\test1.txt"): # find every file in the specified folder that is a test file (test#.txt)
+    for file in glob.glob(testFolder + "\\test*.txt"): # find every file in the specified folder that is a test file (test#.txt)
+    #for file in glob.glob(testFolder + "\\test2.txt"): # find every file in the specified folder that is a test file (test#.txt)
         print("Running: " + file)
         graphInfo = GraphGenerator.generateGraphFromFile(file)
         graph = graphInfo[0] # the graph is at index 0
