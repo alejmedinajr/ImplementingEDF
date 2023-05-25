@@ -24,9 +24,9 @@ def findRidesServed(graph, requestOrder, timeLimit, paths, timeRecord):
     if (timeLimit == 0): return 0 # if the time limit is zero, then we can go ahead and return 0, since we know there are no requests that can be served with this time limit
     
     # We want to see how many requests can be served before the timeLimit is reached or before we serve all requests
-    while (currentTime <= timeLimit and currentRequest < len(requestOrder)):
+    while (currentTime < timeLimit and currentRequest < len(requestOrder)):
         # make sure the current deadline is respected
-        if (currentTime <= graph.getDeadline(requestOrder[currentRequest][0], requestOrder[currentRequest][1])):
+        if (currentTime < graph.getDeadline(requestOrder[currentRequest][0], requestOrder[currentRequest][1])):
             ridesServed += 1 # immediately serve the request
             pathTaken += str(requestOrder[currentRequest][0]) + "-" + str(requestOrder[currentRequest][1]) + "\n"
             timeFootprint.append(currentTime)
@@ -130,8 +130,8 @@ def runTestCases(testFolder):
         graphInfo = GraphGenerator.generateGraphFromFile(file)
         graph = graphInfo[0] # the graph is at index 0
         timeLimit = graphInfo[1] # the timeLimit is at index 1
-        #print("opt: " + str(opt(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
-        print("edf: " + str(edf(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
+        print("opt: " + str(opt(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
+        #print("edf: " + str(edf(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
         Graph.visualizeGraph(graph, file + "Visual.png") # showing visual to the user, also saves as a png image to the folder
 
 if __name__ == '__main__':    
