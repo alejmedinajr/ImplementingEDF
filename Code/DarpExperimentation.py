@@ -8,7 +8,7 @@ import glob
 import itertools
 import random
 
-def findRidesServedOPT(graph, requestOrder, timeLimit, paths, timeRecord):
+def findRidesServed(graph, requestOrder, timeLimit, paths, timeRecord):
     """
     This function will calculate the number of rides able to be served when following a particular order of requests
     :param graph: The structure used to represent the requests
@@ -54,7 +54,7 @@ def opt(graph, timeLimit):
     paths = []
     timeRecord = []
     for requestOrder in permutationsOfRequests: # We need to find the number of requests that can be served for every permutation of request orderings  
-        ridesServed.append(findRidesServedOPT(graph, requestOrder, timeLimit, paths, timeRecord)) # Adding a new possible number of rides that can be served
+        ridesServed.append(findRidesServed(graph, requestOrder, timeLimit, paths, timeRecord)) # Adding a new possible number of rides that can be served
 
     if (len(permutationsOfRequests) == 0): # if there are no permutations, then the list will be empty and we return 0
         return 0
@@ -65,92 +65,59 @@ def opt(graph, timeLimit):
         print(timeRecord[ridesServed.index(max(ridesServed))])
         print(paths[ridesServed.index(max(ridesServed))])
         return max(ridesServed) # return the max possible number of rides that can be served to give the optimal solution
+
+def updateRequests(currentTime, requests):
+    """
+    EDF helper function used to update the available requests that can be served by ensuring that requests from a collection are only added to availableRequests if the release time and deadlines are respected.
+    :param currentTime: The variable used to represent the currentTime in the EDF Algorithm instance
+    :param requests: Collection of possible requests as keys and their deadlines as the values
+    :return: availableRequests, a collection of all requests that are able to be served at currentTime
+    """
+    availableRequests = [] # collection of requests that will be returned
+    for r in requests: # go through every possible request
+        releaseTime = 0 # for now the release time is 0, since this has not been implemented in the graph
+        deadline = requests[r] # the deadline is the value of the map
+        #print(str(currentTime) + ":" + str(deadline))
             
-def updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit):
+        if releaseTime <= currentTime < deadline: # a request must have a relase time that is at least the current time and a deadline that is no greater than the current time
+            availableRequests.append(r) # a new request can be added to the collection of available requests
+    return availableRequests # return the collection of available requests
     
-    # remove all existing requests that cannot be served in availableRequests
-    #print(len(availableRequests))
-    #print(len(availableRequests)-1)
-    i = len(availableRequests)-1
-    while (i > 0):
-        #print("Currenttime: " + str(currentTime))
-        #print("iteration: " + str(i))
-        if currentTime >= graph.getDeadline(availableRequests[i][0], availableRequests[i][1]):
-            del availableRequests[i]
-        i -= 1
-    
-    # remove all requests that cannot be served (violated deadlines) from requests
-    releaseTime = 0 # for now all have release times of 0 until edf is working
-    delete = set() # requests that are violated or that are added to available requests are deleted from requests since they will either be served or end up becoming violated
-    for request in requests:
-        if currentTime > requests[request]: 
-            delete.add(request) # violated deadline, remove from after
-        
-        # add requests to availableRequests if they can be served (respecting arrival time and deadline and windowsize)
-        if releaseTime <= currentTime <= requests[request]:
-            availableRequests.append(request)
-            delete.add(request) 
-
-    #print(delete)
-    delete = list(delete)
-    for d in range(len(delete)):
-        del requests[delete[d]]
-
-    # every request we add needs to be deleted from requests
-    #return 0
-
 def edf(graph, timeLimit):
-    windowSize = 2 # amount of time units we are able to look ahead
-    currentTime = 1 # the current time is 1 to imply moving from an origin point and moving to the first request within the time [0,1]
-    availableRequests = [] # collection of requests that can be served, must be updated after every iteration
-    #requests = graph.edges # collection of every request (requests that are served or cannot be served are removed from here)
-    requests = dict(sorted(graph.edges.items(), key=lambda x: x[1]))
-    #print(requests)
-    #print(sortedRequests)
-    # need to make the initial population of requests in available requests
-    print("Possible Requests to Serve: " + str(availableRequests))
-    updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit)
-    print("Possible Requests to Serve: " + str(availableRequests))
+    """
+    This algorithm is used to find the max number of rides that can be served if requests are served based on earliest deadline first within a given timelimit.
+    :param graph: The graph used to represent the problem, the graph contains all requests and deadlines
+    :param timeLimit: The maximum amount of time units the algorithm is allowed to serve rides for
+    :return: The maximum number of rides that can be served based on the EDF algorithm
+    """
+    windowSize = 2 # the amount of time units we can look forward
+    currentTime = 1 # current time starts at 1 because it is assumed the first time unit will be used to move to any initial location
+    ridesServed = 0 # number of rides that have been served
+    requests = dict(sorted(graph.edges.items(), key=lambda x: x[1])) # all edges that are in a given graph sorted initially by earliest deadline since we want to serve earlier deadlines first if possible
+    availableRequests = [] # available requests that we are able to serve, must be updated at the beginning of every iteration, and if a request is served
+    requestsServed = [] # a collection to keep track of every request that was served and in what order it was served (mainly used for debugging purposes)
+    
+    while currentTime <= timeLimit: # the algorithm ends when the time limit is reached
+        availableRequests = updateRequests(currentTime, requests) # the available requests needs to be updated at the start of every iteration before we serve any rides
 
-    ridesServed = 0 # number of rides we have served
-    # continue looping until either we reach the time limit, we serve all requests, or window equals the timelimit (may not be important)
-    previousRequest = (0,0) # starts off at "origin point" because we know it can never be a valid request location
-    #previousRequest = availableRequests[0] # by default make the previousRequest the first item in availableRequests
-    requestsServed = []
-    while (currentTime <= timeLimit and (len(requests) > 0 or len(availableRequests) > 0)):
-        # check if there are available requests
-        #updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit)
+        if len(availableRequests) > 0: # if there are requests we can serve, we should serve them
+            ridesServed += 1 # serve the request 
+            requestsServed.append(availableRequests[0]) # the first index of available requests is the one served since the request collection was sorted based on deadlines 
+            currentRequest = availableRequests[0] # used to keep track of the current request before it is deleted 
+            del availableRequests[0] # delete the request that was just served
+            del requests[currentRequest] # delete the request from the request collection to make sure it is not possible served again
+            currentTime += 1 # increment the current time to reflect we have served a request
+            availableRequests = updateRequests(currentTime, requests) # serving a request means we must update the available requests, this is due to the current time changing (previously existing requests may be unservable)
+            if len(availableRequests) > 0 and not currentRequest[1] == availableRequests[0][0]: # check if a jump needs to be made
+                currentTime+=1 # a jump will be required, so we must increment the current time by one time unit to reflect this
 
-        if len(availableRequests) > 0:
-            ridesServed += 1 # serve the request
-            #updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit)
+        else: # there are no available requests, we may have to increase the window size to be able to serve requests
+            if windowSize < timeLimit: # only increase the window size if the current window size is smaller than the time limit
+                windowSize += 1 # increase the window size
+                currentTime += 1 # the action of increasing the window size still requires us to increase the current time by one unit since a time unit elapsed (we were just not able to serve anything)
 
-            print("SERVED REQUEST: " + str(availableRequests[0]) + " AT TIME: " + str(currentTime))
-            requestsServed.append(availableRequests[0])
-            #currentTime += 1 # increment the time
-            # a jump was made if the previous request's end coordinate is not the same as the start of the next request
-            if previousRequest == (0,0) and (not previousRequest[1] == availableRequests[0][0]):
-                currentTime += 1
-                updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit)
-
-                print("JUMP AT TIME: " + str(currentTime))
-
-            del availableRequests[0] # remove the request from availableRequests
-            #print("Possible Requests to Serve: " + str(availableRequests))
-
-        # else, there were no available requests
-        else: 
-            # check if windowSize < timeLimit
-            if windowSize < timeLimit:
-                windowSize +=1 # increment the windowSize
-                #currentTime +=1 # if it cannot serve and needs to increase window size, this means a time unit must have elapsed???
-        currentTime+=1        
-        updateRequests(graph, requests, availableRequests, currentTime, windowSize, timeLimit) # regardless update availableRequests here
-        print("Possible Requests to Serve: " + str(availableRequests))
-
-        # increment one timeunit here????           
-    print("Requests Served: " + str(requestsServed))
-    return ridesServed
+    print("REQUESTS SERVED: " + str(requestsServed)) # nice debugging way to see which requests were served before the final solution is returned            
+    return ridesServed # return the number of requests that were served by the EDF algorithm
 
 def runTestCases(testFolder):
     """
@@ -158,7 +125,7 @@ def runTestCases(testFolder):
     :param testFolder: Describes the root folder where the test cases are.
     """
     for file in glob.glob(testFolder + "\\test*.txt"): # find every file in the specified folder that is a test file (test#.txt)
-    #for file in glob.glob(testFolder + "\\test2.txt"): # find every file in the specified folder that is a test file (test#.txt)
+    #for file in glob.glob(testFolder + "\\test4.txt"): # find every file in the specified folder that is a test file (test#.txt)
         print("Running: " + file)
         graphInfo = GraphGenerator.generateGraphFromFile(file)
         graph = graphInfo[0] # the graph is at index 0
