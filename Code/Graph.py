@@ -34,6 +34,28 @@ class Graph:
         
         for i in self.edges: # add each edge of the graph to the nx graph 
             # only add an edge if it has a deadline value that is not zero
+            if (self.edges[i][1] != 0):
+                G.add_edge(i[0],i[1], deadline=str(self.edges[i][0]) + "/-/" + str(self.edges[i][1]))
+
+        # computes the layout using the Fruchterman-Reingold algorithm
+        pos = nx.spring_layout(G, k = 50, seed = 5) # k is the distance between the nodes, seed 5 is being used to avoid getting different graph visuals for the same graph instance, maybe this seed value could be parameterized
+
+        # draw the graph
+        nx.draw(G, pos=pos, node_color='#00b4d9', with_labels=True, width=2, arrowsize=15)
+        deadlines = nx.get_edge_attributes(G,'deadline') # save the deadlines in a collection
+        nx.draw_networkx_edge_labels(G,pos=pos,edge_labels=deadlines, label_pos=0.25, font_size=7, alpha =0.8) # include the deadlines on the graph
+        plt.savefig(saveTo + ".png") # save the vizualization to a png file
+        plt.show() # show the graph
+
+    def visualizeGraphWithSolution(self, algorithm, solution, saveTo):
+        """
+        This function uses networkx and matplot to create an image vizualization of the directed graph
+        :param saveTo: The file where the png graph will be saved to
+        """
+        G = nx.DiGraph() # create a nx directed graph for vizualization
+        
+        for i in self.edges: # add each edge of the graph to the nx graph 
+            # only add an edge if it has a deadline value that is not zero
             if (self.edges[i] != 0):
                 G.add_edge(i[0],i[1], deadline=self.edges[i])
 
@@ -43,10 +65,12 @@ class Graph:
         # draw the graph
         nx.draw(G, pos=pos, node_color='#00b4d9', with_labels=True, width=2, arrowsize=15)
         deadlines = nx.get_edge_attributes(G,'deadline') # save the deadlines in a collection
-        nx.draw_networkx_edge_labels(G,pos=pos,edge_labels=deadlines, label_pos=0.25, font_size=7, alpha =0.8) # include the deadlines on the graph
-        plt.savefig(saveTo) # save the vizualization to a png file
+        nx.draw_networkx_edge_labels(G,pos=pos,edge_labels=deadlines, label_pos=0.25, font_size=7, alpha=0.8) # include the deadlines on the graph
+
+        plt.savefig(saveTo + algorithm + "_SOLUTION.png") # save the vizualization to a png file
         plt.show() # show the graph
-        
+
+
     def getNumberVerticies(self):
         return self.V
 
@@ -73,7 +97,13 @@ class Graph:
     def addEdgeWithDeadline(self, u, v, deadline):
         # function to add an edge to graph
         self.graph[u - 1].append(v - 1)
-        self.edges[u,v] = deadline
+        self.edges[u,v] = 0, deadline
+        # print(self.graph)
+
+    def addEdgeWithReleaseTimeAndDeadline(self, u, v, releaseTime, deadline):
+        # function to add an edge to graph
+        self.graph[u - 1].append(v - 1)
+        self.edges[u,v] = releaseTime, deadline
         # print(self.graph)
 
     def addEdge(self, u, v):
@@ -87,7 +117,11 @@ class Graph:
         
     def getDeadline(self, u, v):
         #print(self.edges)     
-        return self.edges[u,v] 
+        return self.edges[u,v][1] 
+    
+    def getReleaseTime(self, u, v):
+        #print(self.edges)     
+        return self.edges[u,v][0] 
     
     def deleteEdge(self, u, v):
         # function to delete an edge from graph
