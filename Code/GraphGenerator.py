@@ -62,7 +62,7 @@ def createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, f, p, min, 
             if (graph.getDeadline(u,v) == 0): # if the edge is not a request, then we want to remove it from the graph and list of edges, but we do not want to undo the increment to the edge counter
                 graph.deleteEdge(u,v) # delete the edge from the graph since it is not a request
             e += 1 # increase the counter for number of edges since we added a new edge
-            
+
     return graph # return the randomly generated graph
 
 def generateRequestGraphsWithoutDeadlines(numberOfNodes):
@@ -156,7 +156,14 @@ def generateGraphFromFile(graphInstanceFile):
             else: 
                 try:
                     edgeInfo = line.split(' ')
-                    g.addEdgeWithDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2])) # 0 = starting vertex, 1 = ending vertex, 2 = deadline
+                    if len(edgeInfo) == 4:
+                        g.addEdgeWithReleaseTimeAndDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2]), int(edgeInfo[3])) # 0 = starting vertex, 1 = ending vertex, 2 = release time, 3 = deadline
+
+                    elif len(edgeInfo) == 3: 
+                        g.addEdgeWithDeadline(int(edgeInfo[0]), int(edgeInfo[1]), int(edgeInfo[2])) # 0 = starting vertex, 1 = ending vertex, 2 = deadline
+                    
+                    else: 
+                        g.addEdge(int(edgeInfo[0]), int(edgeInfo[1]))
                 except:
                     timeLimit = int(line) # we were given a timelimit input
         f.close() # done reading file, good practice to close it
