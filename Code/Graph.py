@@ -47,17 +47,22 @@ class Graph:
         plt.savefig(saveTo + ".png") # save the vizualization to a png file
         plt.show() # show the graph
 
-    def visualizeGraphWithSolution(self, algorithm, solution, saveTo):
+    def visualizeGraphSolution(self, timesServed, requestsServed, saveTo):
         """
         This function uses networkx and matplot to create an image vizualization of the directed graph
         :param saveTo: The file where the png graph will be saved to
         """
         G = nx.DiGraph() # create a nx directed graph for vizualization
-        
-        for i in self.edges: # add each edge of the graph to the nx graph 
+        timesServed = list(filter(lambda a: a != 'x', timesServed))
+        for edge in self.edges: # add each edge of the graph to the nx graph 
             # only add an edge if it has a deadline value that is not zero
-            if (self.edges[i] != 0):
-                G.add_edge(i[0],i[1], deadline=self.edges[i])
+            if (self.edges[edge] != 0):
+                if edge in requestsServed:
+                    # request was served
+                    serviceTime = timesServed[requestsServed.index(edge)]
+                    G.add_edge(edge[0],edge[1], deadline=str(self.edges[edge][0]) + "/"+ str(serviceTime) + "/" + str(self.edges[edge][1]))
+                else:
+                    G.add_edge(edge[0],edge[1], deadline=str(self.edges[edge][0]) + "/-/" + str(self.edges[edge][1]))
 
         # computes the layout using the Fruchterman-Reingold algorithm
         pos = nx.spring_layout(G, k = 50, seed = 5) # k is the distance between the nodes, seed 5 is being used to avoid getting different graph visuals for the same graph instance, maybe this seed value could be parameterized
@@ -67,7 +72,7 @@ class Graph:
         deadlines = nx.get_edge_attributes(G,'deadline') # save the deadlines in a collection
         nx.draw_networkx_edge_labels(G,pos=pos,edge_labels=deadlines, label_pos=0.25, font_size=7, alpha=0.8) # include the deadlines on the graph
 
-        plt.savefig(saveTo + algorithm + "_SOLUTION.png") # save the vizualization to a png file
+        plt.savefig(saveTo) # save the vizualization to a png file
         plt.show() # show the graph
 
 
