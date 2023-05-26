@@ -26,7 +26,7 @@ def findRidesServed(graph, requestOrder, timeLimit, paths, timeRecord):
     # We want to see how many requests can be served before the timeLimit is reached or before we serve all requests
     while (currentTime < timeLimit and currentRequest < len(requestOrder)):
         # make sure the current deadline is respected
-        if (currentTime < graph.getDeadline(requestOrder[currentRequest][0], requestOrder[currentRequest][1])):
+        if (graph.getReleaseTime(requestOrder[currentRequest][0], requestOrder[currentRequest][1]) <= currentTime < graph.getDeadline(requestOrder[currentRequest][0], requestOrder[currentRequest][1])):
             ridesServed += 1 # immediately serve the request
             pathTaken += str(requestOrder[currentRequest][0]) + "-" + str(requestOrder[currentRequest][1]) + "\n"
             timeFootprint.append(currentTime)
@@ -75,8 +75,8 @@ def updateRequests(currentTime, requests):
     """
     availableRequests = [] # collection of requests that will be returned
     for r in requests: # go through every possible request
-        releaseTime = 0 # for now the release time is 0, since this has not been implemented in the graph
-        deadline = requests[r] # the deadline is the value of the map
+        releaseTime = requests[r][0] # the first value is the release time
+        deadline = requests[r][1] # the second value is the deadline 
         #print(str(currentTime) + ":" + str(deadline))
             
         if releaseTime <= currentTime < deadline: # a request must have a relase time that is at least the current time and a deadline that is no greater than the current time
@@ -125,13 +125,13 @@ def runTestCases(testFolder):
     :param testFolder: Describes the root folder where the test cases are.
     """
     for file in glob.glob(testFolder + "\\test*.txt"): # find every file in the specified folder that is a test file (test#.txt)
-    #for file in glob.glob(testFolder + "\\test4.txt"): # find every file in the specified folder that is a test file (test#.txt)
+    #for file in glob.glob(testFolder + "\\test1.txt"): # find every file in the specified folder that is a test file (test#.txt)
         print("Running: " + file)
         graphInfo = GraphGenerator.generateGraphFromFile(file)
         graph = graphInfo[0] # the graph is at index 0
         timeLimit = graphInfo[1] # the timeLimit is at index 1
         print("opt: " + str(opt(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
-        #print("edf: " + str(edf(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
+        print("edf: " + str(edf(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
         Graph.visualizeGraph(graph, file + "Visual.png") # showing visual to the user, also saves as a png image to the folder
 
 if __name__ == '__main__':    
@@ -141,10 +141,10 @@ if __name__ == '__main__':
     
     # Running random graphs with opt to verify that it works
     #for n in range(20):
-        #g = GraphGenerator.createRandomGraphWithDeadlines(4, random.randint(1, 7), n, random.random(), 0.8, 1, 8)
-        #timeLimit = random.randint(0,15)
+    #    g = GraphGenerator.createRandomGraphWithDeadlines(4, random.randint(1, 7), n, random.random(), 0.8, 1, 8)
+    #    timeLimit = random.randint(0,15)
         #print("opt: " + str(opt(g, timeLimit)) + " with timeLimit: " + str(timeLimit))
-        #Graph.visualizeGraph(g, "randomGenerator4VerticesTest" + str(n) + ".png")
+    #    Graph.visualizeGraph(g, "randomGenerator4VerticesTest" + str(n) + ".png")
     #graphs = GraphGenerator.generateRequestGraphsWithDeadlines(4, 0.8, 1, 7, 5)
     #for g in graphs:
     #    Graph.visualizeGraph(g, "randomRequestGeneratorWith4Vertices5CopiesTest" + str(g.id) + ".png")
