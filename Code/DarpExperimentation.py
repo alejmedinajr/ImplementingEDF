@@ -19,7 +19,7 @@ def findRidesServed(graph, requestOrder, timeLimit, paths, timeRecord):
     currentRequest = 0 # variable responsible for keeping track of the requests. Must not exceed size of requestOrder 
     currentTime = 1 # variable responsible for keeping track of time. Must not exceed timeLimit
     ridesServed = 0 # variable responsible for keeping track of the number of requests served for this permutation of request orders
-    pathTaken = ""
+    pathTaken = []
     timeFootprint = []
     if (timeLimit == 0): return 0 # if the time limit is zero, then we can go ahead and return 0, since we know there are no requests that can be served with this time limit
     
@@ -28,8 +28,8 @@ def findRidesServed(graph, requestOrder, timeLimit, paths, timeRecord):
         # make sure the current deadline is respected
         if (graph.getReleaseTime(requestOrder[currentRequest][0], requestOrder[currentRequest][1]) <= currentTime < graph.getDeadline(requestOrder[currentRequest][0], requestOrder[currentRequest][1])):
             ridesServed += 1 # immediately serve the request
-            pathTaken += str(requestOrder[currentRequest][0]) + "-" + str(requestOrder[currentRequest][1]) + "\n"
-            timeFootprint.append(currentTime)
+            pathTaken.append(requestOrder[currentRequest])
+            timeFootprint.append(currentTime + 1)
         # if the next request is not continuous with the current request, then a jump needs to be made, so currentTime needs to be incremented to reflect this     
         if ((currentRequest < len(requestOrder) - 1) and (not requestOrder[currentRequest][1] == requestOrder[currentRequest+1][0])):
             currentTime += 1 # we have to make a jump since the next request is not connected
@@ -62,9 +62,10 @@ def opt(graph, timeLimit):
         #findPathOfRidesServed(permutationsOfRequests.index(max(ridesServed))) # this function will print the path taken by OPT in order to help with troubleshooting. 
         #print(ridesServed)
         #print(formatPathServed(ridesServed[ridesServed[0].index(max(ridesServed)[0])][1]))
-        print(timeRecord[ridesServed.index(max(ridesServed))])
-        print(paths[ridesServed.index(max(ridesServed))])
-        return max(ridesServed) # return the max possible number of rides that can be served to give the optimal solution
+        optimalSolution = max(ridesServed)
+        print(timeRecord[ridesServed.index(optimalSolution)])
+        print(paths[ridesServed.index(optimalSolution)])
+        return optimalSolution, timeRecord[ridesServed.index(optimalSolution)], paths[ridesServed.index(optimalSolution)] # return the max possible number of rides that can be served to give the optimal solution
 
 def updateRequests(currentTime, requests):
     """
@@ -130,7 +131,9 @@ def runTestCases(testFolder):
         graphInfo = GraphGenerator.generateGraphFromFile(file)
         graph = graphInfo[0] # the graph is at index 0
         timeLimit = graphInfo[1] # the timeLimit is at index 1
-        print("opt: " + str(opt(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
+        optInfo = opt(graph, timeLimit)
+        print("opt: " + str(optInfo[0])+ " with timeLimit: " + str(timeLimit))
+        Graph.visualizeGraphSolution(graph, optInfo[1], optInfo[2], file + "VisualOPTSolution.png")
         print("edf: " + str(edf(graph, timeLimit))+ " with timeLimit: " + str(timeLimit))
         Graph.visualizeGraph(graph, file + "Visual.png") # showing visual to the user, also saves as a png image to the folder
 
