@@ -165,7 +165,10 @@ def generateGraphFromFile(graphInstanceFile):
                     else: 
                         g.addEdge(int(edgeInfo[0]), int(edgeInfo[1]))
                 except:
-                    timeLimit = int(line) # we were given a timelimit input
+                    try:
+                        timeLimit = int(line) # we were given a timelimit input
+                    except:
+                        timeLimit = math.inf # we were not given a timelimit input value, use default value
         f.close() # done reading file, good practice to close it
         return g, timeLimit # return the newly generated graph
     
