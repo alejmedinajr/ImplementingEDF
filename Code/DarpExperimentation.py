@@ -109,6 +109,7 @@ def edf(graph, timeLimit):
             del availableRequests[0] # delete the request that was just served
             del requests[currentRequest] # delete the request from the request collection to make sure it is not possible served again
             currentTime += 1 # increment the current time to reflect we have served a request
+            windowSize = 2 # this will reset the windowSize if it was ever updated. It is important that after a request is served, the window size is set back to 2
             timeServed.append(currentTime)
             availableRequests = updateRequests(currentTime, requests) # serving a request means we must update the available requests, this is due to the current time changing (previously existing requests may be unservable)
             if len(availableRequests) > 0 and not currentRequest[1] == availableRequests[0][0]: # check if a jump needs to be made
