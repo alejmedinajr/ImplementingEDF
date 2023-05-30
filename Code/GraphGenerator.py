@@ -4,7 +4,7 @@ import math
 
 from Graph import Graph
 
-def generateRandomDeadline(p, min, max):
+def generateRandomEdgeAttributes(p, min, max):
     '''
     This function generates a random deadline in the range [min, max] if a randomly generated value is less than or equal to the p parameter value
     :param p: The threshold value used to have a p percent of requests in a graph
@@ -13,8 +13,12 @@ def generateRandomDeadline(p, min, max):
     :return: A randomly generated deadline if the random value does not exceed p, otherwise returns 0
     '''
     isRequest = random.random() <= p # for generating random deadlines, we only want p percent of deadlines (p is parameterized)
-    if (isRequest): return random.randint(min, max) # want random deadline, random deadline value will be in range of (min, max)
-    else: return 0 # no random deadline, return 0 to signify this is not a request
+    if (isRequest):
+        # first randomly generate the release time
+        release = random.randint(0, max - 1) # to ensure that the release time does not equal the deadline otherwise the request will never be able to be served 
+        deadline = random.randint(release+1, max)
+        return release, deadline # return the release and deadline of the request
+    else: return 0,0 # no random deadline, return 0 to signify this is not a request
 
 def createRandomGraphWithoutDeadlines(numberOfNodes, numberOfEdges, id):
     '''
@@ -58,7 +62,8 @@ def createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, f, p, min, 
             v = random.randint(1, numberOfNodes)
 
         if ((f == 0) and (not graph.containsEdge(v, u))) or ((f > 0) and (f >= random.random())): # conditions to add an edge depending on value of f.
-            graph.addEdgeWithDeadline(u, v, generateRandomDeadline(p, min, max)) # randomly generate a deadline between vertices u and v
+            edgeAttributes = generateRandomEdgeAttributes(p, min, max)
+            graph.addEdgeWithReleaseTimeAndDeadline(u, v, edgeAttributes[0], edgeAttributes[1]) # randomly generate release time and deadline
             if (graph.getDeadline(u,v) == 0): # if the edge is not a request, then we want to remove it from the graph and list of edges, but we do not want to undo the increment to the edge counter
                 graph.deleteEdge(u,v) # delete the edge from the graph since it is not a request
             e += 1 # increase the counter for number of edges since we added a new edge
@@ -127,7 +132,8 @@ def generateRequestGraphsWithDeadlines(numberOfNodes, p, min, max, copies):
             for n in range(copies): # we want to make a parameterized amount of copies for each graph created 
                 graph = Graph(numberOfNodes, id) # new graph
                 for k in range(i + 1):
-                    graph.addEdgeWithDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], generateRandomDeadline(p, min, max)) # add an edge with a possibly randomly generted deadline
+                    edgeAttributes = generateRandomEdgeAttributes(p, min, max)
+                    graph.addEdgeWithReleaseTimeAndDeadline(possibleEdgePermutations[i][j][k][0], possibleEdgePermutations[i][j][k][1], edgeAttributes[0], edgeAttributes[1]) # add randomly generated release time and deadline
                 possibleRequestGraphs.append(graph) # add the newly created graph to our collection of graphs
                 id += 1 # incrementing the graph ID for the next graph
             n += 1 # increment the variable to reflect we created +1 copy of the current graph
