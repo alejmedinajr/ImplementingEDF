@@ -99,6 +99,7 @@ def edf(graph, timeLimit):
     availableRequests = [] # available requests that we are able to serve, must be updated at the beginning of every iteration, and if a request is served
     requestsServed = [] # a collection to keep track of every request that was served and in what order it was served (mainly used for debugging purposes)
     timeServed = [] # a collection to keep track of what time the requests were actually served
+    inactive = False
     while currentTime <= timeLimit: # the algorithm ends when the time limit is reached
         availableRequests = updateRequests(currentTime, requests) # the available requests needs to be updated at the start of every iteration before we serve any rides
 
@@ -110,7 +111,10 @@ def edf(graph, timeLimit):
             del requests[currentRequest] # delete the request from the request collection to make sure it is not possible served again
             currentTime += 1 # increment the current time to reflect we have served a request
             windowSize = 2 # this will reset the windowSize if it was ever updated. It is important that after a request is served, the window size is set back to 2
-            timeServed.append(currentTime)
+            if inactive: 
+                timeServed.append(currentTime-1) # subtract one from time current time when appeneding. If we were inactive, then we could have made the jump and waited until release time
+                inactive = False # reset boolean flag
+            else: timeServed.append(currentTime)
             availableRequests = updateRequests(currentTime, requests) # serving a request means we must update the available requests, this is due to the current time changing (previously existing requests may be unservable)
             if len(availableRequests) > 0 and not currentRequest[1] == availableRequests[0][0]: # check if a jump needs to be made
                 currentTime+=1 # a jump will be required, so we must increment the current time by one time unit to reflect this
@@ -121,9 +125,10 @@ def edf(graph, timeLimit):
                 windowSize += 1 # increase the window size
                 currentTime += 1 # the action of increasing the window size still requires us to increase the current time by one unit since a time unit elapsed (we were just not able to serve anything)
                 timeServed.append('x')
+                inactive = True
     
-    print(timeServed)
-    print("REQUESTS SERVED: " + str(requestsServed)) # nice debugging way to see which requests were served before the final solution is returned            
+    #print(timeServed)
+    #print("REQUESTS SERVED: " + str(requestsServed)) # nice debugging way to see which requests were served before the final solution is returned            
     return ridesServed, timeServed, requestsServed # return the number of requests that were served by the EDF algorithm
 
 def runTestCases(testFolder):
@@ -138,9 +143,9 @@ def runTestCases(testFolder):
         graph = graphInfo[0] # the graph is at index 0
         timeLimit = Graph.getTimeLimit(graph, graphInfo[1]) # the timeLimit is at index 1
         Graph.visualizeGraph(graph, timeLimit, file) # showing visual to the user, also saves as a png image to the folder
-        optInfo = opt(graph, timeLimit)
-        print("opt: " + str(optInfo[0])+ " with timeLimit: " + str(timeLimit))
-        Graph.visualizeGraphSolution(graph, timeLimit, optInfo[1], optInfo[2], "OPT" , file)
+        #optInfo = opt(graph, timeLimit)
+        #print("opt: " + str(optInfo[0])+ " with timeLimit: " + str(timeLimit))
+        #Graph.visualizeGraphSolution(graph, timeLimit, optInfo[1], optInfo[2], "OPT" , file)
         edfInfo = edf(graph, timeLimit)
         print("edf: " + str(edfInfo[0])+ " with timeLimit: " + str(timeLimit))
         Graph.visualizeGraphSolution(graph, timeLimit, edfInfo[1], edfInfo[2], "EDF" , file)
