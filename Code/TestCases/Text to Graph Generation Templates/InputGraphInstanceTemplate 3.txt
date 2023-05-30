@@ -1,0 +1,9 @@
+NumberOfVertices
+StartVertex EndVertex ReleaseTime Deadline
+StartVertex EndVertex ReleaseTime Deadline
+StartVertex EndVertex ReleaseTime Deadline
+...
+StartVertex EndVertex ReleaseTime Deadline
+StartVertex EndVertex ReleaseTime Deadline
+StartVertex EndVertex ReleaseTime Deadline
+TimeLimit (optional)
