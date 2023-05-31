@@ -47,7 +47,7 @@ class Graph:
         nx.draw_networkx_edge_labels(G,pos=pos,edge_labels=deadlines, label_pos=0.35, font_size=10, alpha =0.8) # include the deadlines on the graph
         #plt.title('my random fig')
         plt.savefig(saveTo + "Visual.png") # save the vizualization to a png file
-        plt.show() # show the graph
+        #plt.show() # show the graph
 
     def visualizeGraphSolution(self, timelimit, timesServed, requestsServed, method, saveTo):
         """
@@ -82,7 +82,7 @@ class Graph:
         nx.draw_networkx_edge_labels(G,pos=pos, edge_labels=deadlines, label_pos=0.35, font_size=10, alpha=0.8) # include the deadlines on the graph
         
         plt.savefig(saveTo + "VisualSolution" + str(method) + ".png") # save the vizualization to a png file
-        plt.show() # show the graph
+        #plt.show() # show the graph
 
 
     def getNumberVerticies(self):
