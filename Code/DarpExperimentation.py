@@ -31,12 +31,13 @@ def findRidesServed(graph, requestOrder, timeLimit, paths, timeRecord):
             pathTaken.append(requestOrder[currentRequest])
             timeFootprint.append(currentTime)
         # if the next request is not continuous with the current request, then a jump needs to be made, so currentTime needs to be incremented to reflect this     
-        if ((currentRequest < len(requestOrder) - 1) and (not requestOrder[currentRequest][1] == requestOrder[currentRequest+1][0])):
-            currentTime += 1 # we have to make a jump since the next request is not connected
-            if (currentTime < timeLimit): timeFootprint.append('x')
-        
-        currentTime += 1 # at this point, either a request was served, or we could not serve the request. The currentTime needs to be incremented by 1 to reflect this
+            if ((currentRequest < len(requestOrder) - 1) and (not requestOrder[currentRequest][1] == requestOrder[currentRequest+1][0])):
+                currentTime += 1 # we have to make a jump since the next request is not connected
+                if (currentTime < timeLimit): timeFootprint.append('x')
         currentRequest += 1 # update to reflect that regardless of if we served the current request, we need to move to the next request. 
+        
+
+        currentTime += 1 # at this point, either a request was served, or we could not serve the request. The currentTime needs to be incremented by 1 to reflect this
                   
     timeRecord.append(timeFootprint)
     paths.append(pathTaken)              
