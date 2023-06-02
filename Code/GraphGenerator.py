@@ -15,7 +15,7 @@ def generateRandomEdgeAttributes(p, min, max):
     isRequest = random.random() <= p # for generating random deadlines, we only want p percent of deadlines (p is parameterized)
     if (isRequest):
         # first randomly generate the release time
-        release = random.randint(0, max - 1) # to ensure that the release time does not equal the deadline otherwise the request will never be able to be served 
+        release = random.randint(0, max/2) # to ensure that the release time does not equal the deadline otherwise the request will never be able to be served 
         deadline = random.randint(release+1, max)
         return release, deadline # return the release and deadline of the request
     else: return 0,0 # no random deadline, return 0 to signify this is not a request
