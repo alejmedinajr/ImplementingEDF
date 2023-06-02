@@ -60,4 +60,5 @@ def edf(graph, timeLimit):
                 
     #print(timeServed)
     #print("REQUESTS SERVED: " + str(requestsServed)) # nice debugging way to see which requests were served before the final solution is returned            
-    return ridesServed, timeServed, requestsServed # return the number of requests that were served by the EDF algorithm
+    if ridesServed == 0: return 0
+    else: return ridesServed, timeServed, requestsServed # return the number of requests that were served by the EDF algorithm

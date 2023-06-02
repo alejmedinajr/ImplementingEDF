@@ -58,4 +58,6 @@ def opt(graph, timeLimit):
     for requestOrder in itertools.islice(permutationsOfRequests, factorial): # We need to find the number of requests that can be served for every permutation of request orderings  
         ridesServed = findRidesServed(graph, next(permutationsOfRequests), timeLimit, ridesServed, paths, timeRecord) # Adding a new possible number of rides that can be served
 
-    return ridesServed, timeRecord[0], paths[0] # return the max possible number of rides that can be served to give the optimal solution
+    if ridesServed == 0:
+        return 0
+    else: return ridesServed, timeRecord[0], paths[0] # return the max possible number of rides that can be served to give the optimal solution
