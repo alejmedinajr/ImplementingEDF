@@ -74,7 +74,6 @@ class Graph:
         # draw the graph
         nx.draw(G, pos=pos, node_color='#00b4d9', with_labels=True, width=2, arrowsize=15)
         deadlines = nx.get_edge_attributes(G,'deadline') # save the deadlines in a collection
-        colors = nx.get_edge_attributes(G,'color') # save the deadlines in a collection
         if method == "OPT":
             nx.draw_networkx_edges(G, pos, edgelist=requestsServed, arrowsize = 15, width=2, edge_color='red') # opt solution in red
         else: 
@@ -150,11 +149,8 @@ class Graph:
         return len(self.edges) # the length of the edges is the same as the number of requests. This means we can organize permuations based on this
 
     def getTimeLimit(self, timelimit):
-        print(self.edges)
         maxDeadline = -math.inf
         for edge in self.edges:
-            print(edge)
-            print(self.edges[edge][1])
             if self.edges[edge][1] > maxDeadline:
                 maxDeadline = self.edges[edge][1]
 
