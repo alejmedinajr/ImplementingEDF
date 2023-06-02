@@ -3,7 +3,7 @@
 import csv
 import math
 from Graph import Graph
-import GraphGenerator
+import GraphGenerator as GG
 import glob
 import itertools
 import random
@@ -22,10 +22,8 @@ def findRidesServed(graph, requestOrder, timeLimit, currentOptimalRidesServed, p
     pathTaken = []
     timeFootprint = []
     if (timeLimit == 0): return 0 # if the time limit is zero, then we can go ahead and return 0, since we know there are no requests that can be served with this time limit
-    #print("HERE")
-    #print(requestOrder)
     # We want to see how many requests can be served before the timeLimit is reached or before we serve all requests
-    while (currentTime <= timeLimit and currentRequest < len(requestOrder)):
+    while (currentTime < timeLimit and currentRequest < len(requestOrder)):
         # make sure the current deadline is respected
         if (graph.getReleaseTime(requestOrder[currentRequest][0], requestOrder[currentRequest][1]) <= currentTime <= graph.getDeadline(requestOrder[currentRequest][0], requestOrder[currentRequest][1])):
             currentRidesServed += 1 # immediately serve the request
@@ -51,17 +49,6 @@ def findRidesServed(graph, requestOrder, timeLimit, currentOptimalRidesServed, p
     
     else: return currentOptimalRidesServed # return the number of rides that could be served for this specific ordering of requests
 
-
-
-def divide_chunks(iterable, chunk_size):
-    # Divide the iterable into smaller chunks
-    iterator = iter(iterable)
-    while True:
-        chunk = list(itertools.islice(iterator, chunk_size))
-        if not chunk:
-            return
-        yield chunk
-
 def opt(graph, timeLimit):
     """
     Algorithm to find the Max possible number of rides served for a given graph and time limit by using all possible permutations of request orderings
@@ -69,39 +56,7 @@ def opt(graph, timeLimit):
     :param timeLimit: The max amount of time that can be used to serve requests
     :return: Max number of rides that can be served out of every possible permutation
     """
-    permutationsOfRequests = itertools.permutations(graph.edges, graph.getNumberOfRequests())
-    ridesServed = [] # collection of every possible number of rides we can serve
-    paths = []
-    timeRecord = []
-    chunk_size = 100000
-    
-    for chunk in divide_chunks(permutationsOfRequests, chunk_size):
-        print(chunk)
-        for requestOrder in chunk:
-            #print(requestOrder)
-            #print("+++++++++++++++++")
-            #print(chunk)
-            #print(itertools.chain.from_iterable(chunk))
-            ridesServed.append(findRidesServed(graph, requestOrder, timeLimit, paths, timeRecord))
-            #ridesServed.append(findRidesServed(graph, chunk, timeLimit, paths, timeRecord))
-
-    optimalSolution = max(ridesServed)
-    optimalIndex = ridesServed.index(optimalSolution)
-    return optimalSolution, timeRecord[optimalIndex], paths[optimalIndex]
-
-
-def optOriginal(graph, timeLimit):
-    """
-    Algorithm to find the Max possible number of rides served for a given graph and time limit by using all possible permutations of request orderings
-    :param graph: The graph structure being used to represent the requests
-    :param timeLimit: The max amount of time that can be used to serve requests
-    :return: Max number of rides that can be served out of every possible permutation
-    """
-    
-    
-    
     permutationsOfRequests = itertools.permutations(graph.edges, graph.getNumberOfRequests()) # We can use the underlying edges collection to find all possible permutations of request orderings 
-    #smallerPermutationsOfRequests = itertools.islice(permutationsOfRequests, 100000)
     ridesServed = 0 # collection of current best number of rides served
     paths = [] # collection of current best path taken
     timeRecord = [] # collection of current best time record
@@ -109,16 +64,6 @@ def optOriginal(graph, timeLimit):
     for requestOrder in itertools.islice(permutationsOfRequests, factorial): # We need to find the number of requests that can be served for every permutation of request orderings  
         ridesServed = findRidesServed(graph, next(permutationsOfRequests), timeLimit, ridesServed, paths, timeRecord) # Adding a new possible number of rides that can be served
 
-    #if (len(permutationsOfRequests) == 0): # if there are no permutations, then the list will be empty and we return 0
-     #   return 0
-    #else:
-        #findPathOfRidesServed(permutationsOfRequests.index(max(ridesServed))) # this function will print the path taken by OPT in order to help with troubleshooting. 
-        #print(ridesServed)
-        #print(formatPathServed(ridesServed[ridesServed[0].index(max(ridesServed)[0])][1]))
-    
-    #optimalSolution = max(ridesServed)
-    #print(timeRecord[ridesServed.index(optimalSolution)])
-    #print(paths[ridesServed.index(optimalSolution)])
     return ridesServed, timeRecord[0], paths[0] # return the max possible number of rides that can be served to give the optimal solution
 
 def updateRequests(currentTime, requests, windowSize):
@@ -154,7 +99,7 @@ def edf(graph, timeLimit):
     requestsServed = [] # a collection to keep track of every request that was served and in what order it was served (mainly used for debugging purposes)
     timeServed = [] # a collection to keep track of what time the requests were actually served
 
-    while currentTime <= timeLimit and len(requests) + len(availableRequests) > 0 and windowSize < timeLimit: # the algorithm ends when the time limit is reached
+    while currentTime < timeLimit and len(requests) + len(availableRequests) > 0 and windowSize < timeLimit: # the algorithm ends when the time limit is reached
       
         availableRequests = updateRequests(currentTime, requests, windowSize) # the available requests needs to be updated at the start of every iteration before we serve any rides
         
@@ -179,9 +124,31 @@ def edf(graph, timeLimit):
                 windowSize += 1 # increase the window size
                 timeServed.append('x')
                 
-    print(timeServed)
-    print("REQUESTS SERVED: " + str(requestsServed)) # nice debugging way to see which requests were served before the final solution is returned            
+    #print(timeServed)
+    #print("REQUESTS SERVED: " + str(requestsServed)) # nice debugging way to see which requests were served before the final solution is returned            
     return ridesServed, timeServed, requestsServed # return the number of requests that were served by the EDF algorithm
+
+def reportResults(optSolution, edfSolution, writer, file):
+    """
+    This function provides a way to write flagged test cases to csv. The reported solutions for OPT and EDF are 
+    compared and different flags can be thrown depending on both solutions in comparison to each other.
+    The flags can be changed as desired, but this is mainly used when running test cases.
+    :param optSolution: The reported solution given by the OPT algorithm for the specific test case file instance.
+    :param edfSolution: The reported solution given by the EDF algorithm for the specific test case file instance.
+    :param writer: The writer that is used to actually perform the function of writing to the specified csv file.
+    :param file: The current test case file that was run, if there was something worthy of reporting in this test case, the file needs to be reported for easy user verification.
+    """
+    if edfSolution == 2*optSolution: # need to report when edf solution is equal to 2*opt solution
+        writer.writerow(["|EDF| = 2*|OPT|", file, optSolution, edfSolution])
+    
+    if edfSolution != optSolution: # need to report when the two solutions are not the same
+        writer.writerow(["|EDF| differs from |OPT|", file, optSolution, edfSolution])
+
+    if edfSolution > optSolution: # need to report when edf does better than opt (this should never happen)
+        writer.writerow(["|EDF| > |OPT|", file, optSolution, edfSolution])
+
+    if 2*edfSolution < optSolution: # need to report when edf does has a solution more than twice as less than opt (should also never happen)
+        writer.writerow(["|EDF| < 2*|OPT|", file, optSolution, edfSolution])
 
 
 def runTestCases(testFolder):
@@ -189,36 +156,26 @@ def runTestCases(testFolder):
     This function provides a way to run test cases from a specific directory. The visual of each graph is saved as a png file and shown to the user.
     :param testFolder: Describes the root folder where the test cases are.
     """
-    with open(testFolder + "Report.csv", 'w', newline='') as report: # create a csv report of the results. This is where any flagged test cases will be reported
+    with open(testFolder + " Report.csv", 'w', newline='') as report: # create a csv report of the results. This is where any flagged test cases will be reported
         writer = csv.writer(report) # create the writer for the csv file
         fields = ["flag", "testcase", "OPT", "EDF"] # fields of what will be written to the csv
         writer.writerow(fields) # writing the first row to csv file - contains all the fields
     
         for file in glob.glob(testFolder + "\\test*.txt"): # find every file in the specified folder that is a test file (test#.txt)
             print("Running: " + file) # print statement to let the user know which file test case is currently running
-            graphInfo = GraphGenerator.generateGraphFromFile(file) # function to generate the graph from the specified file
+            graphInfo = GG.generateGraphFromFile(file) # function to generate the graph from the specified file
             graph = graphInfo[0] # the graph is at index 0
             timeLimit = Graph.getTimeLimit(graph, graphInfo[1]) # the timeLimit is at index 1
             #print(timeLimit)
             Graph.visualizeGraph(graph, timeLimit, file) # save visual of the graph prior to any algorithms being run
-            optInfo = optOriginal(graph, timeLimit) # optInfo contains everything returned by opt algorithm
+            optInfo = opt(graph, timeLimit) # optInfo contains everything returned by opt algorithm
             print("opt: " + str(optInfo[0])+ " with timeLimit: " + str(timeLimit)) # display opt result to console
             Graph.visualizeGraphSolution(graph, timeLimit, optInfo[1], optInfo[2], "OPT" , file) # create visual of opt result and store it in test suite directory
             edfInfo = edf(graph, timeLimit) # edge info contains everything returned by edf algorithm
             print("edf: " + str(edfInfo[0])+ " with timeLimit: " + str(timeLimit)) # display edf result to console
             Graph.visualizeGraphSolution(graph, timeLimit, edfInfo[1], edfInfo[2], "EDF" , file) # create visual of edf result and store it in test suite directory
-            if edfInfo[0] == 2*optInfo[0]: # need to report when edf solution is equal to 2*opt solution
-                writer.writerow(["|EDF| = 2*|OPT|", file, optInfo[0], edfInfo[0]])
-    
-            if edfInfo[0] != optInfo[0]: # need to report when the two solutions are not the same
-                writer.writerow(["|EDF| differs from |OPT|", file, optInfo[0], edfInfo[0]])
-    
-            if edfInfo[0] > optInfo[0]: # need to report when edf does better than opt (this should never happen)
-                writer.writerow(["|EDF| > |OPT|", file, optInfo[0], edfInfo[0]])
-    
-            if 2*edfInfo[0] < optInfo[0]: # need to report when edf does has a solution more than twice as less than opt (should also never happen)
-                writer.writerow(["|EDF| < 2*|OPT|", file, optInfo[0], edfInfo[0]])
-        
+            
+            reportResults(optInfo[0], edfInfo[0], writer, file)
 
 if __name__ == '__main__':    
     # To run the test cases, the lines until the next empty line need to be uncommented.
