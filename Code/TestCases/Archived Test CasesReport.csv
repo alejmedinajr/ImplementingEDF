@@ -1,0 +1,6 @@
+flag,testcase,OPT,EDF
+|EDF| differs from |OPT|,TestCases\Archived Test Cases\test1.txt,4,2
+|EDF| differs from |OPT|,TestCases\Archived Test Cases\test6.txt,5,3
+|EDF| differs from |OPT|,TestCases\Archived Test Cases\test7.txt,5,4
+|EDF| differs from |OPT|,TestCases\Archived Test Cases\test8.txt,2,3
+|EDF| > |OPT|,TestCases\Archived Test Cases\test8.txt,2,3
