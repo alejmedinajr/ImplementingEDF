@@ -1,9 +1,10 @@
 import csv
 from Graph import Graph
-import GraphGenerator as GG
+import GraphGenerator as gg
 import glob
 from OPT import opt
 from EDF import edf
+import random
 
 def reportResults(optSolution, edfSolution, writer, file):
     """
@@ -33,7 +34,7 @@ def runTestCases(testFolder):
     This function provides a way to run test cases from a specific directory. The visual of each graph is saved as a png file and shown to the user.
     :param testFolder: Describes the root folder where the test cases are.
     """
-    with open(testFolder + " Report.csv", 'w', newline='') as report: # create a csv report of the results. This is where any flagged test cases will be reported
+    with open(testFolder + " - Report.csv", 'w', newline='') as report: # create a csv report of the results. This is where any flagged test cases will be reported
         writer = csv.writer(report) # create the writer for the csv file
         fields = ["flag", "testcase", "OPT", "EDF"] # fields of what will be written to the csv
         writer.writerow(fields) # writing the first row to csv file - contains all the fields
@@ -54,14 +55,44 @@ def runTestCases(testFolder):
             
             reportResults(optInfo[0], edfInfo[0], writer, file)
 
+
+def runRandomTestCases(minNodes, maxNodes, minEdges, maxEdges, minTimelimit, maxTimelimit, f, p, min, max, graphsGenerated, testFolder, saveTo):
+    
+    with open(testFolder + " - Report.csv", 'w', newline='') as report: # create a csv report of the results. This is where any flagged test cases will be reported
+        writer = csv.writer(report) # create the writer for the csv file
+        fields = ["flag", "testcase", "OPT", "EDF"] # fields of what will be written to the csv
+        writer.writerow(fields) # writing the first row to csv file - contains all the fields
+    
+        numberOfNodes = random.randint(minNodes, maxNodes)
+        numberOfEdges = random.randint(minEdges, maxEdges)
+        timelimit = random.randint(minTimelimit, maxTimelimit)
+        id = 0 # the id that will be used for the file saved of the randomly created graph
+        for i in range(graphsGenerated):
+            file = testFolder + "\\" + saveTo + "_" + str(id) 
+            graph = gg.createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, f, p, min, max)
+            Graph.visualizeGraph(graph, timelimit, file) # save visual of the graph prior to any algorithms being run
+            optInfo = opt(graph, timelimit) # optInfo contains everything returned by opt algorithm
+            print("opt: " + str(optInfo[0])+ " with timeLimit: " + str(timelimit)) # display opt result to console
+            Graph.visualizeGraphSolution(graph, timelimit, optInfo[1], optInfo[2], "OPT" , file) # create visual of opt result and store it in test suite directory
+            edfInfo = edf(graph, timelimit) # edge info contains everything returned by edf algorithm
+            print("edf: " + str(edfInfo[0])+ " with timeLimit: " + str(timelimit)) # display edf result to console
+            Graph.visualizeGraphSolution(graph, timelimit, edfInfo[1], edfInfo[2], "EDF" , file) # create visual of edf result and store it in test suite directory
+            
+            reportResults(optInfo[0], edfInfo[0], writer, file)
+            id += 1
+
+
 if __name__ == '__main__':    
     # To run the test cases, the lines until the next empty line need to be uncommented.
     #testFolder = "TestCases"
-    testFolder = "TestCases\\Archived Test Cases"
-    runTestCases(testFolder)
+    #testFolder = "TestCases\\Archived Test Cases"
+    #runTestCases(testFolder)
+    
     #testFolder = "TestCases"
     #runTestCases(testFolder)
     
+    testFolder = "TestCases\\Randomly Generated Test Cases\\batch1"
+    runRandomTestCases(3, 15, 3, 15, 5, 50, 0.75, 0.75, 2, 30, 1000, testFolder, "randomGeneratedTestCasesBatch1")
     # Running random graphs with opt to verify that it works
     #for n in range(20):
     #    g = GraphGenerator.createRandomGraphWithDeadlines(4, random.randint(1, 7), n, random.random(), 0.8, 1, 8)
