@@ -112,14 +112,14 @@ class Graph:
     def addEdgeWithDeadline(self, u, v, deadline):
         # function to add an edge to graph
         self.graph[u - 1].append(v - 1)
-        if deadline > 0:
+        if deadline > 1: #deadline 0 or 1 can never be served
             self.edges[u,v] = 0, deadline
         # print(self.graph)
 
     def addEdgeWithReleaseTimeAndDeadline(self, u, v, releaseTime, deadline):
         # function to add an edge to graph
         self.graph[u - 1].append(v - 1)
-        if deadline > 0:
+        if deadline > 1: # deadline 0 or 1 can never be served
             self.edges[u,v] = releaseTime, deadline
         # print(self.graph)
 
