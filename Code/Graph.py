@@ -56,7 +56,7 @@ class Graph:
         :param saveTo: The file where the png graph will be saved to
         """
         G = nx.DiGraph() # create a nx directed graph for vizualization
-        timesServed = list(filter(lambda a: a != 'x', timesServed))
+        #timesServed = list(filter(lambda a: a != 'x', timesServed))
         for edge in self.edges: # add each edge of the graph to the nx graph 
             # only add an edge if it has a deadline value that is not zero
             if (self.edges[edge][1] != 0 and self.edges[edge][1] != 1):
@@ -112,13 +112,15 @@ class Graph:
     def addEdgeWithDeadline(self, u, v, deadline):
         # function to add an edge to graph
         self.graph[u - 1].append(v - 1)
-        self.edges[u,v] = 0, deadline
+        if deadline > 0:
+            self.edges[u,v] = 0, deadline
         # print(self.graph)
 
     def addEdgeWithReleaseTimeAndDeadline(self, u, v, releaseTime, deadline):
         # function to add an edge to graph
         self.graph[u - 1].append(v - 1)
-        self.edges[u,v] = releaseTime, deadline
+        if deadline > 0:
+            self.edges[u,v] = releaseTime, deadline
         # print(self.graph)
 
     def addEdge(self, u, v):
@@ -146,7 +148,7 @@ class Graph:
         del self.edges[u,v]
 
     def getNumberOfRequests(self):
-        return len(self.edges) # the length of the edges is the same as the number of requests. This means we can organize permuations based on this
+        return len(self.edges)
 
     def getTimeLimit(self, timelimit):
         maxDeadline = -math.inf
