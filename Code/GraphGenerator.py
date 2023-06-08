@@ -15,7 +15,7 @@ def generateRandomEdgeAttributes(p, min, max):
     isRequest = random.random() <= p # for generating random deadlines, we only want p percent of deadlines (p is parameterized)
     if (isRequest):
         # first randomly generate the release time
-        release = random.randint(0, max/2) # to ensure that the release time does not equal the deadline otherwise the request will never be able to be served 
+        release = random.randint(0, int(max/2)) # to ensure that the release time does not equal the deadline otherwise the request will never be able to be served 
         deadline = random.randint(release+1, max)
         return release, deadline # return the release and deadline of the request
     else: return 0,0 # no random deadline, return 0 to signify this is not a request
@@ -64,8 +64,6 @@ def createRandomGraphWithDeadlines(numberOfNodes, numberOfEdges, id, f, p, min, 
         if ((f == 0) and (not graph.containsEdge(v, u))) or ((f > 0) and (f >= random.random())): # conditions to add an edge depending on value of f.
             edgeAttributes = generateRandomEdgeAttributes(p, min, max)
             graph.addEdgeWithReleaseTimeAndDeadline(u, v, edgeAttributes[0], edgeAttributes[1]) # randomly generate release time and deadline
-            if (graph.getDeadline(u,v) == 0): # if the edge is not a request, then we want to remove it from the graph and list of edges, but we do not want to undo the increment to the edge counter
-                graph.deleteEdge(u,v) # delete the edge from the graph since it is not a request
             e += 1 # increase the counter for number of edges since we added a new edge
 
     return graph # return the randomly generated graph
