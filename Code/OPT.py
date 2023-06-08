@@ -12,15 +12,17 @@ def findRidesServed(graph, requestOrder, timeLimit, currentOptimalRidesServed, p
     :return: A set containing the number of rides served in the given time limit and the path taken, when serving in the given order
     """
     currentRequest = 0 # variable responsible for keeping track of the requests. Must not exceed size of requestOrder 
-    currentTime = 2 # variable responsible for keeping track of time. Must not exceed timeLimit. Starts at two because that is the first time we are able to serve requests
+    currentTime = 1 # variable responsible for keeping track of time. Must not exceed timeLimit. Starts at two because that is the first time we are able to serve requests
     currentRidesServed = 0 # variable responsible for keeping track of the number of requests served for this permutation of request orders
     pathTaken = []
     timeFootprint = []
     #if (timeLimit == 0): return 0 # if the time limit is zero, then we can go ahead and return 0, since we know there are no requests that can be served with this time limit
     # We want to see how many requests can be served before the timeLimit is reached or before we serve all requests
     while (currentTime < timeLimit and currentRequest < len(requestOrder)):
+        release = graph.getReleaseTime(requestOrder[currentRequest][0], requestOrder[currentRequest][1])
+        deadline = graph.getDeadline(requestOrder[currentRequest][0], requestOrder[currentRequest][1])
         # make sure the current deadline is respected
-        if (graph.getReleaseTime(requestOrder[currentRequest][0], requestOrder[currentRequest][1]) <= currentTime <= graph.getDeadline(requestOrder[currentRequest][0], requestOrder[currentRequest][1])):
+        if (release <= currentTime < deadline):
             currentRidesServed += 1 # immediately serve the request
             pathTaken.append(requestOrder[currentRequest])
             timeFootprint.append(currentTime)
@@ -49,12 +51,13 @@ def opt(graph, timeLimit):
     :return: Max number of rides that can be served out of every possible permutation
     """
     start = time.time()
-    permutationsOfRequests = itertools.permutations(graph.edges, graph.getNumberOfRequests()) # We can use the underlying edges collection to find all possible permutations of request orderings 
+    #permutationsOfRequests = itertools.permutations(graph.edges, graph.getNumberOfRequests()) # We can use the underlying edges collection to find all possible permutations of request orderings 
     ridesServed = [0] # collection of current best number of rides served
     paths = ['x'] # collection of current best path taken
     timeRecord = ['x'] # collection of current best time record
     factorial = math.factorial(graph.getNumberOfRequests())
-    for requestOrder in itertools.islice(permutationsOfRequests, factorial): # We need to find the number of requests that can be served for every permutation of request orderings  
+    #for requestOrder in itertools.islice(permutationsOfRequests, factorial): # We need to find the number of requests that can be served for every permutation of request orderings  
+    for requestOrder in itertools.permutations(graph.edges): # We need to find the number of requests that can be served for every permutation of request orderings  
         findRidesServed(graph, requestOrder, timeLimit, ridesServed, paths, timeRecord) # Adding a new possible number of rides that can be served
 
     end = time.time()
