@@ -14,7 +14,7 @@ def updateRequests(currentTime, requests, windowSize, timelimit):
         releaseTime = requests[r][0] # the first value is the release time
         deadline = requests[r][1] # the second value is the deadline 
         
-        if releaseTime <= currentTime + windowSize - 2 <= deadline and currentTime + windowSize - 2 < timelimit: # we can look ahead using the window size if need be. Since the window size is default of 2, this also makes sure we do not look ahead if we do not need to (windowsize - 2 would be 0 in this case) 
+        if releaseTime <= currentTime + windowSize - 2 < deadline and currentTime + windowSize - 2 < timelimit: # we can look ahead using the window size if need be. Since the window size is default of 2, this also makes sure we do not look ahead if we do not need to (windowsize - 2 would be 0 in this case) 
             availableRequests.append(r) # a new request can be added to the collection of available requests
     
     return availableRequests # return the collection of available requests
@@ -29,7 +29,7 @@ def edf(graph, timeLimit):
     start = time.time()
 
     windowSize = 2 # the amount of time units we can look forward
-    currentTime = 2 # current time starts at 2 because it is assumed the first time unit will be used to move to any initial location, therefore 2 can be the earliest time a request can be served
+    currentTime = 1 # current time starts at 2 because it is assumed the first time unit will be used to move to any initial location, therefore 2 can be the earliest time a request can be served
     ridesServed = 0 # number of rides that have been served
     requests = dict(sorted(graph.edges.items(), key=lambda x: x[1][1])) # all edges that are in a given graph sorted initially by earliest deadline since we want to serve earlier deadlines first if possible
     availableRequests = [] # available requests that we are able to serve, must be updated at the beginning of every iteration, and if a request is served
